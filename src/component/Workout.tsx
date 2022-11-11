@@ -2,50 +2,54 @@ import { Button, makeStyles } from "@rneui/themed";
 import React from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { View } from "react-native";
-import {
-  Set as SetType,
-  SetGroup as SetGroupType,
-  Workout as WorkoutType,
-} from "utils/types/Workout";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { createSetGroup } from "src/store/actions/setgroupActions";
+import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
+
 import SetGroup from "./SetGroup";
 
 type Props = {
   onClose: () => void;
-  workoutData: Partial<WorkoutType>;
+  workoutData: Partial<WorkoutJoin>;
   isCollapsed: boolean;
-};
-
-export type WorkoutForm = {
-  setGroups?: SetGroupType[];
-};
-
-export const defaultSet: SetType = {
-  set_type: "normal",
-  reps: undefined,
-  weight: undefined,
-  done: false,
-  order: 1,
-};
-
-const defaultSetGroup: SetGroupType = {
-  exercise: {
-    name: "Bench Press",
-  },
-  order: 1,
-  sets: [defaultSet],
 };
 
 export default function Workout({ onClose, workoutData, isCollapsed }: Props) {
   const styles = useStyles({ isCollapsed });
 
-  const methods = useForm<WorkoutForm>();
+  const methods = useForm<WorkoutJoin>({
+    defaultValues: workoutData,
+  });
   const { control, handleSubmit } = methods;
   const { fields, append } = useFieldArray({
     control,
     name: "setGroups",
+    keyName: "fieldId",
   });
 
   const onSubmit = (data) => console.log(JSON.stringify(data, null, 4));
+  const handleAppendSetGroup = () => {
+    const defaultSetGroup = {
+      order: fields.length + 1,
+      exercise_id: "xrc_3f3885226027_53",
+      exercise: {
+        id: "xrc_3f3885226027_53",
+        name: "Bench Press",
+        archived: false,
+      },
+      sets: [],
+      archived: false,
+      workout_id: workoutData.id,
+    };
+
+    const id = createSetGroup.dispatch({
+      workout_id: defaultSetGroup.workout_id,
+      order: defaultSetGroup.order,
+      exercise_id: defaultSetGroup.exercise_id,
+    });
+
+    append({ ...defaultSetGroup, id });
+  };
 
   return (
     <View style={styles.container}>
@@ -60,11 +64,14 @@ export default function Workout({ onClose, workoutData, isCollapsed }: Props) {
       </View>
 
       {!isCollapsed && (
-        <View style={styles.form}>
+        <KeyboardAwareScrollView
+          showsVerticalScrollIndicator={false}
+          style={styles.form}
+        >
           {fields.map((setGroup, setGroupIndex) => {
             return (
               <SetGroup
-                key={setGroup.id}
+                key={setGroup.fieldId}
                 setGroup={setGroup}
                 setGroupIndex={setGroupIndex}
                 methods={methods}
@@ -75,14 +82,14 @@ export default function Workout({ onClose, workoutData, isCollapsed }: Props) {
           <Button
             style={{ marginBottom: 20 }}
             title="append setgroup"
-            onPress={() => append(defaultSetGroup)}
+            onPress={handleAppendSetGroup}
           />
           <Button
             style={{ marginBottom: 20 }}
             title="submit"
             onPress={handleSubmit(onSubmit)}
           />
-        </View>
+        </KeyboardAwareScrollView>
       )}
     </View>
   );
@@ -112,7 +119,5 @@ const useStyles = makeStyles((theme, { isCollapsed }) => ({
   },
   form: {
     width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
   },
 }));

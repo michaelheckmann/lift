@@ -6,13 +6,14 @@ import {
   UseFormReturn,
 } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
+import { createSet } from "src/store/actions/setActions";
+import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 import Set from "./Set";
-import { defaultSet, WorkoutForm } from "./Workout";
 
 type Props = {
-  setGroup: FieldArrayWithId<WorkoutForm, "setGroups", "id">;
+  setGroup: FieldArrayWithId<WorkoutJoin, "setGroups", "id">;
   setGroupIndex: number;
-  methods: UseFormReturn<WorkoutForm, any>;
+  methods: UseFormReturn<WorkoutJoin, any>;
 };
 
 export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
@@ -22,7 +23,23 @@ export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
   const { fields, append, remove } = useFieldArray({
     control,
     name: `setGroups.${setGroupIndex}.sets` as "setGroups.0.sets",
+    keyName: "fieldId",
   });
+
+  const handleAppendSet = () => {
+    const defaultSet = {
+      weight: 0,
+      reps: 0,
+      done: false,
+      archived: false,
+      setgroup_id: setGroup.id,
+    };
+    const id = createSet.dispatch({
+      setgroup_id: defaultSet.setgroup_id,
+    });
+
+    append({ ...defaultSet, id });
+  };
 
   return (
     <View style={styles.container} key={setGroup.id}>
@@ -42,7 +59,12 @@ export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
       {/* Sets */}
       <View>
         {fields.map((set, setIndex) => (
-          <Set key={set.id} set={set} setIndex={setIndex} methods={methods} />
+          <Set
+            key={set.fieldId}
+            set={set}
+            setIndex={setIndex}
+            methods={methods}
+          />
         ))}
       </View>
 
@@ -59,7 +81,7 @@ export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
         )}
         
       /> */}
-      <Button title="Add set" onPress={() => append(defaultSet)} />
+      <Button title="Add set" onPress={handleAppendSet} />
     </View>
   );
 }

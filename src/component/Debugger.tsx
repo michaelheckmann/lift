@@ -1,10 +1,5 @@
 import Icon from "@expo/vector-icons/MaterialIcons";
-import {
-  disableNetwork,
-  enableNetwork,
-  getFirestore,
-} from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import Animated, {
@@ -12,32 +7,17 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { resetState, StoreType, useBlockStore } from "src/store";
+import {
+  toggleOnlineState,
+  toggleOnlineTesting,
+} from "src/store/actions/operationsActions";
 
-const db = getFirestore();
+const selector = (state) => state.operations;
 
 export default function Debugger() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isOnline, setIsOnline] = useState(false);
-
-  useEffect(() => {
-    if (isOnline) {
-      (async () => {
-        try {
-          await enableNetwork(db);
-        } catch (error) {
-          setIsOnline(false);
-        }
-      })();
-    } else {
-      (async () => {
-        try {
-          await disableNetwork(db);
-        } catch (error) {
-          setIsOnline(true);
-        }
-      })();
-    }
-  }, [isOnline]);
+  const operations: StoreType["operations"] = useBlockStore(selector);
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -64,15 +44,56 @@ export default function Debugger() {
 
   return (
     <PanGestureHandler onGestureEvent={gestureHandler}>
-      <Animated.View style={[styles.fab, animatedStyle]}>
+      <Animated.View
+        style={[
+          styles.fab,
+          animatedStyle,
+          {
+            borderRadius: isOpen ? 30 : 50,
+          },
+        ]}
+      >
+        {/* Debug Container */}
         {isOpen && (
-          <View style={styles.offlineContainer}>
-            <Text style={styles.offlineText}>
-              {isOnline ? "ONLINE" : "OFFLINE"}
-            </Text>
-            <Switch value={isOnline} onValueChange={setIsOnline} />
+          <View style={styles.debugContainer}>
+            <View style={styles.row}>
+              {/* ONLINE ENABLED */}
+              <View style={styles.toggleContainer}>
+                <Text style={styles.toggleLabel}>TESTING: ONLINE</Text>
+                <Switch
+                  trackColor={{ false: "#3e3e3e", true: "#81b0ff" }}
+                  ios_backgroundColor="#3e3e3e"
+                  value={operations.config.testing.isOnline.enabled}
+                  onValueChange={toggleOnlineTesting}
+                />
+              </View>
+
+              {/* ONLINE VALUE */}
+              <View style={styles.toggleContainer}>
+                <Text style={styles.toggleLabel}>
+                  {operations.config.testing.isOnline.value
+                    ? "ONLINE"
+                    : "OFFLINE"}
+                </Text>
+                <Switch
+                  trackColor={{ false: "#3e3e3e", true: "#81b0ff" }}
+                  ios_backgroundColor="#3e3e3e"
+                  value={operations.config.testing.isOnline.value}
+                  onValueChange={toggleOnlineState}
+                />
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.toggleContainer}>
+                <TouchableOpacity onPress={resetState} style={styles.button}>
+                  <Text style={styles.buttonLabel}>Reset State</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         )}
+
+        {/* Fab Icon */}
         <TouchableOpacity onPress={() => setIsOpen((o) => !o)}>
           <Icon name="code" color="white" size={30} />
         </TouchableOpacity>
@@ -103,17 +124,39 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "white",
   },
-  offlineContainer: {
+  row: {
+    marginBottom: 10,
+  },
+  toggleContainer: {
     flexDirection: "row",
-    backgroundColor: "white",
-    padding: 10,
+    width: "100%",
+    borderColor: "white",
+    borderWidth: 1.5,
+    borderStyle: "dashed",
     borderRadius: 10,
-    marginRight: 20,
-    marginLeft: 20,
+    padding: 10,
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 10,
   },
-  offlineText: {
+  toggleLabel: {
+    color: "white",
+    letterSpacing: 1.1,
     marginRight: 10,
+  },
+  debugContainer: {
+    width: 300,
+    height: 300,
+  },
+  button: {
+    backgroundColor: "white",
+    padding: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  buttonLabel: {
+    color: "black",
+    letterSpacing: 1.1,
+    fontWeight: "bold",
   },
 });

@@ -1,0 +1,9 @@
+[X] => Join towards a unified Workout
+[X] => Add user_id to Zustand
+[ ] => Add user_id to db tables
+[ ] => Testing
+[ ] => Fix Animation Bottom Slider
+[ ] => CRON job user create, attach user_id
+[ ] => PM2 postgrest
+[ ] => Postgrest public key file and update
+[ ] =>

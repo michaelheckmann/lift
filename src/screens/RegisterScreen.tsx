@@ -2,13 +2,13 @@ import Icon from "@expo/vector-icons/Ionicons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button, Input, makeStyles } from "@rneui/themed";
 import { StatusBar } from "expo-status-bar";
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import DismissKeyboard from "src/component/DismissKeyboard";
+import { auth } from "src/config/firebase";
 import { useToast } from "src/utils/hooks/useToast";
 
-const auth = getAuth();
 const SignUpScreen: React.FC<NativeStackScreenProps<any>> = ({
   navigation,
 }) => {

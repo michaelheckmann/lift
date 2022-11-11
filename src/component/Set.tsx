@@ -1,12 +1,12 @@
 import React from "react";
 import { FieldArrayWithId, UseFormReturn } from "react-hook-form";
 import { Text, View } from "react-native";
-import { WorkoutForm } from "./Workout";
+import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 
 type Props = {
-  set: FieldArrayWithId<WorkoutForm, "setGroups.0.sets", "id">;
+  set: FieldArrayWithId<WorkoutJoin, "setGroups.0.sets", "id">;
   setIndex: number;
-  methods: UseFormReturn<WorkoutForm, any>;
+  methods: UseFormReturn<WorkoutJoin, any>;
 };
 
 export default function Set({ set, setIndex, methods }: Props) {

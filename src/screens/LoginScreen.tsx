@@ -1,13 +1,12 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import { Button, Input, makeStyles } from "@rneui/themed";
 import { StatusBar } from "expo-status-bar";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import DismissKeyboard from "src/component/DismissKeyboard";
+import { auth } from "src/config/firebase";
 import { useToast } from "src/utils/hooks/useToast";
-
-const auth = getAuth();
 
 const SignInScreen = () => {
   const styles = useStyles();

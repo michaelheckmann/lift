@@ -1,43 +1,54 @@
 import { Button, makeStyles } from "@rneui/themed";
 import { StatusBar } from "expo-status-bar";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import React, { useState } from "react";
-import { View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, View } from "react-native";
 import WorkoutSheet from "src/component/WorkoutSheet";
-import { collections } from "src/utils/functions/firestore";
-import { useAuth } from "src/utils/hooks/useAuth";
+import { createWorkout } from "src/store/actions/workoutsActions";
+import { getWorkoutbyId } from "src/utils/functions/dataFetching";
+import { useActiveWorkout } from "src/utils/hooks/useActiveWorkout";
+import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 
 export default function HomeScreen() {
   const styles = useStyles();
-  const { user } = useAuth();
   const [isWorkoutSheetOpen, setIsWorkoutSheetOpen] = useState(false);
-  const [workoutId, setWorkoutId] = useState("");
+  const [workoutData, setWorkoutData] = useState<Partial<WorkoutJoin>>({});
+  const activeWorkoutId = useActiveWorkout();
 
-  const createBlankWorkout = () => {
-    const ref = doc(collections.workouts);
-    setDoc(ref, {
-      user_id: user.uid,
-      date: serverTimestamp(),
-      done: false,
-    });
-    setWorkoutId(ref.id);
+  const setExistingWorkout = () => {
+    const activeWorkout = getWorkoutbyId(activeWorkoutId);
+    console.log(activeWorkout);
+    setWorkoutData(activeWorkout);
     setIsWorkoutSheetOpen(true);
   };
 
+  const createBlankWorkout = () => {
+    const id = createWorkout.dispatch();
+    console.log("CREATE WORKOUT ID", id);
+    setWorkoutData({ id });
+    setIsWorkoutSheetOpen(true);
+  };
+
+  useEffect(() => {
+    if (activeWorkoutId && !isWorkoutSheetOpen) {
+      setExistingWorkout();
+    }
+  }, [activeWorkoutId]);
+
   return (
     <View style={styles.container}>
+      <Text>Active Workout: {activeWorkoutId}</Text>
       <Button
         title="Blank workout"
         buttonStyle={styles.button}
         containerStyle={styles.buttonContainer}
         onPress={createBlankWorkout}
-        disabled={isWorkoutSheetOpen}
+        disabled={isWorkoutSheetOpen || !!activeWorkoutId}
       />
 
       <WorkoutSheet
         isOpen={isWorkoutSheetOpen}
         onClose={() => setIsWorkoutSheetOpen(false)}
-        workoutData={{ id: workoutId }}
+        workoutData={workoutData}
       />
       <StatusBar style="auto" />
     </View>

@@ -1,39 +1,38 @@
 import { Button, makeStyles, Switch } from "@rneui/themed";
 import { StatusBar } from "expo-status-bar";
-import { getAuth, signOut } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { collections } from "src/utils/functions/firestore";
+import { auth } from "src/config/firebase";
+import { useBlockStore } from "src/store";
+import { updateSettings } from "src/store/actions/settingsActions";
 import { useAuth } from "src/utils/hooks/useAuth";
 
-const auth = getAuth();
+const selector = (state) => state.settings.theme;
 
 export default function SettingsScreen() {
   const styles = useStyles();
-  const { user, profile } = useAuth();
-
-  const setTheme = (e: boolean) => {
-    const ref = doc(collections.profiles, user.uid);
-    updateDoc(ref, {
-      "settings.theme": e ? "dark" : "light",
-    });
-  };
+  const { user } = useAuth();
+  const theme = useBlockStore(selector);
 
   const logout = () => {
     signOut(auth);
   };
 
-  if (!user || !profile) {
+  if (!user) {
     return <ActivityIndicator size="large" />;
   }
 
   return (
     <View style={styles.container}>
-      <Text>Settings screen! {profile.settings.theme}</Text>
+      <Text>Settings screen! {theme}</Text>
       <Switch
-        value={profile.settings.theme === "dark"}
-        onValueChange={setTheme}
+        value={theme === "dark"}
+        onValueChange={() =>
+          updateSettings.dispatch({
+            theme: theme === "dark" ? "light" : "dark",
+          })
+        }
         style={{ marginBottom: 100, marginTop: 100 }}
       />
       <Button title="Logout" onPress={logout} />

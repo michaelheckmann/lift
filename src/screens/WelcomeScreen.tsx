@@ -2,12 +2,10 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button, makeStyles, Text } from "@rneui/themed";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { FC } from "react";
 import { View } from "react-native";
 
-const WelcomeScreen: React.FC<NativeStackScreenProps<any>> = ({
-  navigation,
-}) => {
+const WelcomeScreen: FC<NativeStackScreenProps<any>> = ({ navigation }) => {
   const styles = useStyles();
   const [fontsLoaded] = useFonts({
     OkineBlackOutline: require("assets/fonts/OkineBlackOutline.otf"),

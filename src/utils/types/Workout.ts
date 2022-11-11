@@ -1,27 +1,23 @@
-import { FieldValue } from "firebase/firestore";
-import { Exercise } from "./Exercise";
+import {
+  ClientExlude,
+  ServerExcludeCreate,
+  ServerExcludeUpdate,
+} from "./lib/ExclusionHelper";
 
-export type Set = {
-  order: number;
-  set_type: "drop_set" | "normal";
-  note?: string;
-  reps: number;
-  weight: number;
-  done: boolean;
-};
-
-export type SetGroup = {
-  id?: string;
-  exercise: Exercise;
-  order: number;
-  sets: Set[];
-  note?: string;
-};
-
-export type Workout = {
-  id?: string;
-  done: boolean;
+type Workout = {
+  id: string;
   user_id: string;
-  date: Date | FieldValue;
-  setGroups?: SetGroup[];
+
+  done: boolean;
+  archived: boolean;
+
+  created_at: Date;
+  updated_at: Date;
 };
+
+export type WorkoutCreate = Omit<Workout, ServerExcludeCreate>;
+export type WorkoutUpdate = Partial<Omit<Workout, ServerExcludeUpdate>>;
+
+type ClientKeep = Pick<Workout, "created_at">;
+
+export type WorkoutSlice = Omit<Workout, ClientExlude> & ClientKeep;
