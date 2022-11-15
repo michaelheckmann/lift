@@ -1,10 +1,11 @@
-import { useTheme } from "@rneui/themed";
+import { CreateThemeOptions, useTheme } from "@rneui/themed";
 import { useEffect } from "react";
 import { useBlockStore } from "src/store";
 import { defaultTheme } from "../themes/default";
 import { darkTheme } from "./../themes/dark";
+import { Themes } from "./../types/Settings";
 
-const themes = {
+const themes: { [theme in Themes]: CreateThemeOptions } = {
   light: defaultTheme,
   dark: darkTheme,
 };

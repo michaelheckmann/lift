@@ -1,5 +1,6 @@
 import "@rneui/themed";
 
+// Custom extension of the default types
 declare module "@rneui/themed" {
   export interface Colors {
     grey6: string;

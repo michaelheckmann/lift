@@ -6,6 +6,7 @@ import { SettingSlice } from "src/utils/types/Settings";
 import { WorkoutSlice } from "src/utils/types/Workout";
 import create from "zustand";
 import { persist, subscribeWithSelector } from "zustand/middleware";
+import { logger } from "./middleware";
 import { exercisesState } from "./slices/exercisesSlice";
 import { OperationSlice, operationsState } from "./slices/operationsSlice";
 import { setGroupsState } from "./slices/setgroupsSlice";
@@ -23,26 +24,31 @@ export interface StoreType {
 }
 
 export const useBlockStore = create<StoreType>()(
-  // logger(
-  subscribeWithSelector(
-    persist(
-      () => ({
-        settings: settingsState,
-        operations: operationsState,
-        exercises: exercisesState,
-        setGroups: setGroupsState,
-        sets: setsState,
-        workouts: workoutsState,
-      }),
-      {
-        name: "block-storage",
-        getStorage: () => AsyncStorage,
-      }
+  logger(
+    // subscribeWithSelector is necessary for sub function in useCustomTheme
+    // https://docs.pmnd.rs/zustand/recipes/recipes#reading/writing-state-and-reacting-to-changes-outside-of-components
+    subscribeWithSelector(
+      persist(
+        () => ({
+          settings: settingsState,
+          operations: operationsState,
+          exercises: exercisesState,
+          setGroups: setGroupsState,
+          sets: setsState,
+          workouts: workoutsState,
+        }),
+        {
+          name: "block-storage",
+          getStorage: () => AsyncStorage,
+        }
+      )
     )
   )
-  // )
 );
 
+/**
+ * It resets the state of the block store to the default state
+ */
 export const resetState = () => {
   useBlockStore.setState({
     settings: settingsState,

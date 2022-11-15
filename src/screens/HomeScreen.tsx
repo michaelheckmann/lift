@@ -16,7 +16,6 @@ export default function HomeScreen() {
 
   const setExistingWorkout = () => {
     const activeWorkout = getWorkoutbyId(activeWorkoutId);
-    console.log(activeWorkout);
     setWorkoutData(activeWorkout);
     setIsWorkoutSheetOpen(true);
   };
@@ -36,7 +35,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>Active Workout: {activeWorkoutId}</Text>
+      <Text>Active Workout: {activeWorkoutId || "new workout"}</Text>
       <Button
         title="Blank workout"
         buttonStyle={styles.button}

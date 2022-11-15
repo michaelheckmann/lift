@@ -1,4 +1,6 @@
 // https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid
+// The UUID prefix is generated based on the first 3 consonants of the database type
+// If the word has three characters or less, the first 3 characters are used
 export function generateUUID(prefix: string) {
   let d = new Date().getTime();
   const id = "xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -11,8 +13,10 @@ export function generateUUID(prefix: string) {
   return `${prefix}_${id}_${number}`;
 }
 
-// To be called from /scripts directory
+// This is only relevant if the file is called from /scripts directory
 if (process?.argv && process.argv.length > 1) {
   const prefix = process.argv[2];
-  console.log(generateUUID(prefix));
+  if (prefix) {
+    console.log(generateUUID(prefix));
+  }
 }

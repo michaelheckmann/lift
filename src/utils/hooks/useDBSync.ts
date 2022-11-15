@@ -4,6 +4,10 @@ import { useEffect } from "react";
 import { useBlockStore } from "src/store";
 import { dequeueOperation } from "src/store/actions/operationsActions";
 
+/**
+ * If the app is online, work the queue. If the app is offline, queue changes and
+ * work the queue when the app comes back online.
+ */
 export function useDBSync() {
   const { config, queue } = useBlockStore((state) => state.operations);
 
@@ -15,6 +19,7 @@ export function useDBSync() {
   };
 
   useEffect(() => {
+    // This is used to mock the online state
     // console.log("is online changed", config.testing.isOnline);
     const { enabled, value: isOnline } = config.testing.isOnline;
     let unsubscribe: NetInfoSubscription;

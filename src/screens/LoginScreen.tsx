@@ -8,7 +8,7 @@ import DismissKeyboard from "src/component/DismissKeyboard";
 import { auth } from "src/config/firebase";
 import { useToast } from "src/utils/hooks/useToast";
 
-const SignInScreen = () => {
+const LoginScreen = () => {
   const styles = useStyles();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -82,4 +82,4 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default SignInScreen;
+export default LoginScreen;

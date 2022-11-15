@@ -1,5 +1,6 @@
 import { State, StateCreator, StoreMutatorIdentifier } from "zustand";
 
+// Taken from https://docs.pmnd.rs/zustand/guides/typescript#middleware-that-doesn't-change-the-store-type
 type Logger = <
   T extends State,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],

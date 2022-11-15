@@ -4,8 +4,9 @@ import {
   ServerExcludeUpdate,
 } from "./lib/ExclusionHelper";
 
-type Themes = "light" | "dark";
+export type Themes = "light" | "dark";
 
+// Mirrors the shape on the server
 type Setting = {
   id: string;
   user_id: string;

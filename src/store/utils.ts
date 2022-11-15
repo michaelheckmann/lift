@@ -11,6 +11,12 @@ export type Action<T> = {
   _rollback: (arg: T, db: StoreType) => void;
 };
 
+/**
+ * This function handles the main logic for mutation the store and the database.
+ * It takes an action object and an argument, and then it either commits the action or enqueues it
+ * @param obj - The action object that you want to dispatch.
+ * @param {T} arg - The argument passed to the action
+ */
 export const dispatchAction = async <T, U>(obj: Action<T> & U, arg: T) => {
   const preState = useBlockStore.getState();
   obj._store(arg);

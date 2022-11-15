@@ -4,6 +4,7 @@ import {
   ServerExcludeUpdate,
 } from "./lib/ExclusionHelper";
 
+// Mirrors the shape on the server
 type Workout = {
   id: string;
   user_id: string;

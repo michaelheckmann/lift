@@ -3,6 +3,7 @@ import { auth } from "src/config/firebase";
 type Methods = "POST" | "PATCH";
 
 /**
+ * This function is used to sync the local state with the remote database.
  * It takes an endpoint, a method, and a body, and returns a boolean
  * @param {string} endpoint - The endpoint you want to hit on the backend.
  * @param {Methods} method - The HTTP method to use.
