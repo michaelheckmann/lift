@@ -1,5 +1,8 @@
 /* eslint-disable no-undef, import/no-extraneous-dependencies */
 
+// load env variables
+require("dotenv").config();
+
 /***********  Reanimated  ***********/
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
@@ -57,30 +60,41 @@ jest.mock("react-native-keyboard-aware-scroll-view", () => {
 });
 
 /***********  Custom Hooks  ***********/
+
+const mockUser = {
+  displayName: "Test User",
+  email: "test-user@test.com",
+  emailVerified: false,
+  isAnonymous: false,
+  metadata: {},
+  phoneNumber: "",
+  photoURL: "",
+  providerData: [],
+  providerId: "",
+  refreshToken: "",
+  tenantId: "",
+  uid: "test-user-id",
+  delete: jest.fn(),
+  getIdToken: jest.fn().mockReturnValue(process.env.CUSTOM_ID_TOKEN),
+  getIdTokenResult: jest.fn(),
+  reload: jest.fn(),
+  toJSON: jest.fn(),
+};
+
 jest.mock("../utils/hooks/useAuth.ts", () => {
   const useAuthReturnValue: UseAuthReturnType = {
-    user: {
-      displayName: "Test User",
-      email: "test-user@test.com",
-      emailVerified: false,
-      isAnonymous: false,
-      metadata: {},
-      phoneNumber: "",
-      photoURL: "",
-      providerData: [],
-      providerId: "",
-      refreshToken: "",
-      tenantId: "",
-      uid: "test-user-id",
-      delete: jest.fn(),
-      getIdToken: jest.fn(),
-      getIdTokenResult: jest.fn(),
-      reload: jest.fn(),
-      toJSON: jest.fn(),
-    },
+    user: mockUser,
   };
   return {
     useAuth: jest.fn().mockReturnValue(useAuthReturnValue),
+  };
+});
+
+jest.mock("src/config/firebase", () => {
+  return {
+    auth: {
+      currentUser: mockUser,
+    },
   };
 });
 

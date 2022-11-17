@@ -36,6 +36,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text>Active Workout: {activeWorkoutId || "new workout"}</Text>
+      <Text>{JSON.stringify(workoutData, null, 4)}</Text>
       <Button
         title="Blank workout"
         buttonStyle={styles.button}

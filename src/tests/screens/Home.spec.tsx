@@ -1,6 +1,11 @@
 import React from "react";
 
-import { screen, waitFor } from "@testing-library/react-native";
+import {
+  cleanup,
+  fireEvent,
+  screen,
+  waitFor,
+} from "@testing-library/react-native";
 import { navigationProps } from "src/config/jest";
 import HomeScreen from "src/screens/HomeScreen";
 import { useBlockStore } from "src/store";
@@ -14,16 +19,18 @@ describe("Previous Workout", () => {
   beforeAll(() => {
     useBlockStore.setState(defaultMockStore);
   });
+  afterEach(cleanup);
 
   it("loads the active workout on startup if there is one", async () => {
-    const workoutId = "1";
+    const workoutId = "wrk1";
     spy.mockReturnValue(workoutId);
 
     renderOnion(<HomeScreen {...navigationProps} />);
-    await waitFor(() =>
-      expect(screen.getByText(workoutId, { exact: false })).toBeVisible()
-    );
+    expect(
+      screen.getByText("Active Workout: " + workoutId, { exact: false })
+    ).toBeVisible();
   });
+
   it("does not load the active workout on startup if there is none", async () => {
     spy.mockReturnValue(undefined);
 
@@ -31,5 +38,41 @@ describe("Previous Workout", () => {
     await waitFor(() =>
       expect(screen.getByText("new workout", { exact: false })).toBeVisible()
     );
+  });
+});
+
+describe("<HomeScreen />", () => {
+  it("has at least 1 child", async () => {
+    const tree: any = renderOnion(<HomeScreen {...navigationProps} />).toJSON();
+    expect(tree.length).toBeGreaterThan(0);
+  });
+});
+
+describe("Blank Workout", () => {
+  beforeAll(() => {
+    useBlockStore.setState(defaultMockStore);
+  });
+
+  it("creates a new workout, if the blank workout button is pressed", async () => {
+    const dbSync = require("src/utils/functions/dbSync");
+    jest
+      .spyOn(dbSync, "updateRemoteState")
+      .mockImplementation(() => Promise.resolve(true));
+    spy.mockReturnValue(undefined);
+    const workoutLength = useBlockStore.getState().workouts.length;
+    renderOnion(<HomeScreen {...navigationProps} />);
+
+    fireEvent.press(screen.getByText("Blank workout", { exact: false }));
+
+    expect(useBlockStore.getState().workouts).toHaveLength(workoutLength + 1);
+  });
+
+  it("does not create a new workout, if the blank workout button is pressed and there is an active workout", async () => {
+    spy.mockReturnValue("wrk1");
+    const workoutLength = useBlockStore.getState().workouts.length;
+    renderOnion(<HomeScreen {...navigationProps} />);
+
+    fireEvent.press(screen.getByText("Blank workout", { exact: false }));
+    expect(useBlockStore.getState().workouts).toHaveLength(workoutLength);
   });
 });

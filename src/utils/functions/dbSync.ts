@@ -1,3 +1,4 @@
+import fetch from "cross-fetch";
 import { auth } from "src/config/firebase";
 
 type Methods = "POST" | "PATCH";
@@ -32,9 +33,9 @@ export async function updateRemoteState<T>(
     body: JSON.stringify(body),
   };
 
-  return fetch(`https://block.ceto.live/api/${endpoint}`, options)
+  return fetch(`http://block.ceto.live/api/${endpoint}`, options)
     .then((res) => {
-      // console.log("RES", res);
+      // console.log("RES STATUS", res.status);
       return res.status < 400;
     })
     .catch((err) => {

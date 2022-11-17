@@ -13,19 +13,19 @@ export const defaultMockStore: StoreType = {
   setGroups: [
     ...setGroupsState,
     {
-      id: "1",
+      id: "stg1",
       archived: false,
       exercise_id: exercisesState[0].id, // Bench Press
-      workout_id: "1",
+      workout_id: "wrk1",
       order: 1,
     },
   ],
   sets: [
     ...setsState,
     {
-      id: "1",
+      id: "set1",
       archived: false,
-      setgroup_id: "1",
+      setgroup_id: "stg1",
       reps: 10,
       weight: 100,
       done: true,
@@ -34,7 +34,7 @@ export const defaultMockStore: StoreType = {
   workouts: [
     ...workoutsState,
     {
-      id: "1",
+      id: "wrk1",
       archived: false,
       created_at: new Date("2022-11-13"),
       done: false,

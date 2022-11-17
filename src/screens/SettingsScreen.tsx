@@ -27,6 +27,7 @@ export default function SettingsScreen() {
     <View style={styles.container}>
       <Text>Settings screen! {theme}</Text>
       <Switch
+        testID="theme-switch"
         value={theme === "dark"}
         onValueChange={() =>
           updateSettings.dispatch({
