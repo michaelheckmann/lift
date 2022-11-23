@@ -1,9 +1,9 @@
 // Types
 
-import { Action } from "../utils";
+import { ActionType } from "src/utils/types/lib/Actions";
 
 export type QueueItem = {
-  obj: Action<any>;
+  obj: ActionType;
   arg: any;
 };
 

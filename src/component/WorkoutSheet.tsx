@@ -179,7 +179,7 @@ const useStyles = makeStyles((theme) => ({
     },
     shadowRadius: 8,
     elevation: 5,
-    padding: 20,
+    padding: 10,
     justifyContent: "center",
     alignItems: "center",
   },

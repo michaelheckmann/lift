@@ -20,7 +20,7 @@ export function useAuth(): UseAuthReturnType {
       async (user) => {
         if (user) {
           // User is signed in
-          console.log(await user.getIdToken());
+          // console.log(await user.getIdToken());
           setUserId(user.uid);
           setUser(user);
         } else {

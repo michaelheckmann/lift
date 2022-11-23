@@ -2,7 +2,8 @@ import {
   ClientExlude,
   ServerExcludeCreate,
   ServerExcludeUpdate,
-} from "./lib/ExclusionHelper";
+  ServerIncludeUpdate,
+} from "./lib/Helpers";
 
 // Mirrors the shape on the server
 type Workout = {
@@ -17,7 +18,8 @@ type Workout = {
 };
 
 export type WorkoutCreate = Omit<Workout, ServerExcludeCreate>;
-export type WorkoutUpdate = Partial<Omit<Workout, ServerExcludeUpdate>>;
+export type WorkoutUpdate = Partial<Omit<Workout, ServerExcludeUpdate>> &
+  ServerIncludeUpdate;
 
 type ClientKeep = Pick<Workout, "created_at">;
 

@@ -1,7 +1,7 @@
 import update from "immutability-helper";
+import { Action } from "src/utils/types/lib/Actions";
 import { StoreType, useBlockStore } from "..";
 import { QueueItem } from "../slices/operationsSlice";
-import { Action } from "../utils";
 
 // Actions
 export const enqueueOperation = (operation: QueueItem) => {

@@ -6,7 +6,9 @@ import {
   UseFormReturn,
 } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
-import { createSet } from "src/store/actions/setActions";
+import { RectButton } from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import { createSet, updateSet } from "src/store/actions/setActions";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 import Set from "./Set";
 
@@ -14,6 +16,22 @@ type Props = {
   setGroup: FieldArrayWithId<WorkoutJoin, "setGroups", "id">;
   setGroupIndex: number;
   methods: UseFormReturn<WorkoutJoin, any>;
+};
+
+const renderLeftActions = (remove) => {
+  return (
+    <RectButton
+      style={{
+        backgroundColor: "red",
+        width: 100,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      onPress={remove}
+    >
+      <Text style={{ fontWeight: "bold", color: "white" }}>Archive</Text>
+    </RectButton>
+  );
 };
 
 export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
@@ -41,8 +59,16 @@ export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
     append({ ...defaultSet, id });
   };
 
+  const handleRemoveSet = (setIndex) => {
+    remove(setIndex);
+    updateSet.dispatch({
+      id: fields[setIndex].id,
+      archived: true,
+    });
+  };
+
   return (
-    <View style={styles.container} key={setGroup.id}>
+    <View style={styles.container}>
       {/* Set Group Header */}
       <View style={styles.header}>
         <TouchableOpacity style={[styles.headerButton, styles.setGroupOptions]}>
@@ -59,12 +85,26 @@ export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
       {/* Sets */}
       <View>
         {fields.map((set, setIndex) => (
-          <Set
-            key={set.fieldId}
-            set={set}
-            setIndex={setIndex}
-            methods={methods}
-          />
+          <View style={{ marginBottom: 10 }}>
+            <Swipeable
+              key={set.fieldId}
+              renderRightActions={() =>
+                renderLeftActions(() => handleRemoveSet(setIndex))
+              }
+              rightThreshold={40}
+              overshootFriction={8}
+              shouldCancelWhenOutside
+              containerStyle={{ backgroundColor: "red" }}
+            >
+              <Set
+                key={set.fieldId}
+                set={set}
+                setIndex={setIndex}
+                setGroupIndex={setGroupIndex}
+                methods={methods}
+              />
+            </Swipeable>
+          </View>
         ))}
       </View>
 
@@ -131,6 +171,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
   },
   setsHeaderText: {
     fontWeight: "bold",

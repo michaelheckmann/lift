@@ -26,9 +26,9 @@ const colors: RecursivePartial<Colors> = {
 
 const border = {
   radius: {
-    xs: 4,
-    sm: 6,
-    md: 8,
+    xs: 2,
+    sm: 4,
+    md: 6,
   },
   width: {
     sm: 1,

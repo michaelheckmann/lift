@@ -3,6 +3,17 @@ import { auth } from "src/config/firebase";
 
 type Methods = "POST" | "PATCH";
 
+export function updateRemoteState<T>(
+  endpoint: string,
+  method: "POST",
+  body: T
+): Promise<boolean>;
+export function updateRemoteState<T>(
+  endpoint: string,
+  method: "PATCH",
+  body: Omit<T, "id">
+): Promise<boolean>;
+
 /**
  * This function is used to sync the local state with the remote database.
  * It takes an endpoint, a method, and a body, and returns a boolean
@@ -34,8 +45,9 @@ export async function updateRemoteState<T>(
   };
 
   return fetch(`http://block.ceto.live/api/${endpoint}`, options)
-    .then((res) => {
+    .then(async (res) => {
       // console.log("RES STATUS", res.status);
+      // console.log("RES MESSAGE", await res.text());
       return res.status < 400;
     })
     .catch((err) => {

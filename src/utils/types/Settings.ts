@@ -2,7 +2,8 @@ import {
   ClientExlude,
   ServerExcludeCreate,
   ServerExcludeUpdate,
-} from "./lib/ExclusionHelper";
+  ServerIncludeUpdate,
+} from "./lib/Helpers";
 
 export type Themes = "light" | "dark";
 
@@ -19,6 +20,7 @@ type Setting = {
 };
 
 export type SettingCreate = Omit<Setting, ServerExcludeCreate>;
-export type SettingUpdate = Partial<Omit<Setting, ServerExcludeUpdate>>;
+export type SettingUpdate = Partial<Omit<Setting, ServerExcludeUpdate>> &
+  ServerIncludeUpdate;
 
 export type SettingSlice = Omit<Setting, ClientExlude>;

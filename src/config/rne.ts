@@ -40,7 +40,7 @@ export const theme = createTheme({
     },
     Input: {
       inputContainerStyle: {
-        borderRadius: border.radius.md,
+        borderRadius: border.radius.sm,
         paddingVertical: spacing.sm,
         paddingHorizontal: spacing.xl,
         backgroundColor: "transparent",

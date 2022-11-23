@@ -2,27 +2,27 @@ import { useBlockStore } from "src/store";
 import { updateRemoteState } from "src/utils/functions/dbSync";
 
 import update from "immutability-helper";
+import { Action } from "src/utils/types/lib/Actions";
 import { SettingUpdate } from "src/utils/types/Settings";
-import { Action, dispatchAction } from "../utils";
+import { dispatchAction } from "../utils";
 
 // Actions
 export const updateSettings: Action<SettingUpdate> = {
-  dispatch(settings) {
-    dispatchAction(updateSettings, settings);
+  dispatch(args) {
+    dispatchAction(updateSettings, args);
   },
-  _commit(settings) {
-    const userId = useBlockStore.getState().operations.global.userId;
+  _commit({ id, ...args }) {
     return updateRemoteState<SettingUpdate>(
-      `settings?user_id=eq.${userId}`,
+      `settings?id=eq.${id}`,
       "PATCH",
-      settings
+      args
     );
   },
-  _store(settings) {
+  _store(args) {
     useBlockStore.setState(
       update(useBlockStore.getState(), {
         settings: {
-          $merge: settings,
+          $merge: args,
         },
       })
     );

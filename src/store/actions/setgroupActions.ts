@@ -2,42 +2,31 @@ import update from "immutability-helper";
 import { useBlockStore } from "src/store";
 import { updateRemoteState } from "src/utils/functions/dbSync";
 import { generateUUID } from "src/utils/functions/generateUUID";
+import { Action } from "src/utils/types/lib/Actions";
 import { SetGroupCreate, SetGroupSlice } from "src/utils/types/SetGroup";
-import { Overwrite } from "../../utils/types/lib/Overwrite";
-import { Action, dispatchAction } from "../utils";
+import { dispatchAction } from "../utils";
 
-type SetGroupDispatchArgs = {
+type CreateSetGroupDispatchArgs = {
   workout_id: string;
   order: number;
   exercise_id: string;
 };
 
-type CreateSetGroupType = Overwrite<
-  Action<SetGroupCreate>,
-  {
-    dispatch: (setGroupDispatchArgs: SetGroupDispatchArgs) => string;
-  }
->;
-
 // Actions
-export const createSetGroup: CreateSetGroupType = {
-  dispatch({ workout_id, order, exercise_id }) {
-    const id = generateUUID("stg");
-    dispatchAction<SetGroupCreate, any>(createSetGroup, {
-      id,
-      workout_id,
-      exercise_id,
-      order,
-    });
-    return id;
+export const createSetGroup: Action<
+  SetGroupCreate,
+  CreateSetGroupDispatchArgs
+> = {
+  dispatch(args) {
+    const setGroup: SetGroupCreate = {
+      id: generateUUID("stg"),
+      ...args,
+    };
+    dispatchAction<SetGroupCreate>(createSetGroup, setGroup);
+    return setGroup.id;
   },
-  _commit({ id, workout_id, exercise_id, order }) {
-    return updateRemoteState<SetGroupCreate>("setgroups", "POST", {
-      id,
-      workout_id,
-      exercise_id,
-      order,
-    });
+  _commit(args) {
+    return updateRemoteState<SetGroupCreate>("setgroups", "POST", args);
   },
   _store({ id, workout_id, exercise_id, order }) {
     const newSetGroup: SetGroupSlice = {
@@ -47,7 +36,6 @@ export const createSetGroup: CreateSetGroupType = {
       workout_id,
       archived: false,
     };
-
     useBlockStore.setState(
       update(useBlockStore.getState(), {
         setGroups: {

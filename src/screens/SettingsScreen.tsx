@@ -7,13 +7,15 @@ import { auth } from "src/config/firebase";
 import { useBlockStore } from "src/store";
 import { updateSettings } from "src/store/actions/settingsActions";
 import { useAuth } from "src/utils/hooks/useAuth";
+import { SettingSlice } from "src/utils/types/Settings";
 
-const selector = (state) => state.settings.theme;
+const selector = (state) => state.settings;
 
 export default function SettingsScreen() {
   const styles = useStyles();
   const { user } = useAuth();
-  const theme = useBlockStore(selector);
+  const settings: SettingSlice = useBlockStore(selector);
+  const { id: settingsId, theme } = settings;
 
   const logout = () => {
     signOut(auth);
@@ -31,6 +33,7 @@ export default function SettingsScreen() {
         value={theme === "dark"}
         onValueChange={() =>
           updateSettings.dispatch({
+            id: settingsId,
             theme: theme === "dark" ? "light" : "dark",
           })
         }

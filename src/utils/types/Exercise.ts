@@ -2,7 +2,8 @@ import {
   ClientExlude,
   ServerExcludeCreate,
   ServerExcludeUpdate,
-} from "./lib/ExclusionHelper";
+  ServerIncludeUpdate,
+} from "./lib/Helpers";
 
 // Mirrors the shape on the server
 type Exercise = {
@@ -17,6 +18,7 @@ type Exercise = {
 };
 
 export type ExerciseCreate = Omit<Exercise, ServerExcludeCreate>;
-export type ExerciseUpdate = Partial<Omit<Exercise, ServerExcludeUpdate>>;
+export type ExerciseUpdate = Partial<Omit<Exercise, ServerExcludeUpdate>> &
+  ServerIncludeUpdate;
 
 export type ExerciseSlice = Omit<Exercise, ClientExlude>;

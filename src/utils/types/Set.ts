@@ -2,7 +2,8 @@ import {
   ClientExlude,
   ServerExcludeCreate,
   ServerExcludeUpdate,
-} from "./lib/ExclusionHelper";
+  ServerIncludeUpdate,
+} from "./lib/Helpers";
 
 // Mirrors the shape on the server
 type Set = {
@@ -20,6 +21,7 @@ type Set = {
 };
 
 export type SetCreate = Omit<Set, ServerExcludeCreate>;
-export type SetUpdate = Partial<Omit<Set, ServerExcludeUpdate>>;
+export type SetUpdate = Partial<Omit<Set, ServerExcludeUpdate>> &
+  ServerIncludeUpdate;
 
 export type SetSlice = Omit<Set, ClientExlude>;

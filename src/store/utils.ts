@@ -1,15 +1,7 @@
 import NetInfo from "@react-native-community/netinfo";
 import { useBlockStore } from "src/store";
-import { StoreType } from ".";
-import { ActionExclude } from "../utils/types/lib/ExclusionHelper";
+import { ActionType } from "src/utils/types/lib/Actions";
 import { commitAction, enqueueOperation } from "./actions/operationsActions";
-
-export type Action<T> = {
-  dispatch: (arg: Omit<T, ActionExclude>) => void;
-  _store: (arg: T) => void;
-  _commit: (arg: T) => Promise<boolean>;
-  _rollback: (arg: T, db: StoreType) => void;
-};
 
 /**
  * This function handles the main logic for mutation the store and the database.
@@ -17,7 +9,7 @@ export type Action<T> = {
  * @param obj - The action object that you want to dispatch.
  * @param {T} arg - The argument passed to the action
  */
-export const dispatchAction = async <T, U>(obj: Action<T> & U, arg: T) => {
+export const dispatchAction = async <T>(obj: ActionType, arg: T) => {
   const preState = useBlockStore.getState();
   obj._store(arg);
 
