@@ -5,8 +5,8 @@
  * @param [timeout=300] - The time in milliseconds to wait before calling the function.
  */
 export function debounce(func, timeout = 300) {
-  let timer;
-  return (...args) => {
+  let timer: NodeJS.Timeout;
+  return (...args: any) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
       func.apply(this, args);

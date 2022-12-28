@@ -1,6 +1,6 @@
 import { Portal, PortalHost } from "@gorhom/portal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { makeStyles } from "@rneui/themed";
+import { makeStyles, useTheme } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { Dimensions, useWindowDimensions } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
@@ -38,11 +38,12 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
   const styles = useStyles();
   const tabBarHeight = useBottomTabBarHeight();
   const dimensions = useWindowDimensions();
+  const { theme } = useTheme();
 
   const top = useSharedValue(dimensions.height);
   const bottom = useSharedValue(0);
   const shadowOpacity = useSharedValue(0.2);
-  const borderRadius = useSharedValue(20);
+  const borderRadius = useSharedValue(theme.borderRadius.sm);
   const borderWidth = useSharedValue(0);
   const backDropOpacity = useSharedValue(0);
 
@@ -167,11 +168,7 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     left: 0,
     right: 0,
-    // bottom: 0,
     backgroundColor: theme.colors.background,
-    borderColor: theme.colors.grey2,
-    // borderTopLeftRadius: 20,
-    // borderTopRightRadius: 20,
     shadowColor: theme.colors.black,
     shadowOffset: {
       width: 0,

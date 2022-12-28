@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   headingContainer: {
     width: "100%",
     alignItems: "center",
-    marginBottom: theme.spacing.dxl,
+    marginBottom: theme.spacing["15"],
   },
   heading: {
     fontSize: 40,
@@ -62,19 +62,19 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 58,
   },
   button: {
-    marginBottom: theme.spacing.xxl,
+    marginBottom: theme.spacing["15"],
   },
   buttonContainer: {
     width: "100%",
-    paddingHorizontal: theme.spacing.cxl,
+    paddingHorizontal: theme.spacing["15"],
   },
   buttonOutline: {
     backgroundColor: "transparent",
-    borderColor: theme.colors.grey7,
-    borderWidth: theme.border.width.lg,
+    borderColor: theme.colors.gray300,
+    borderWidth: theme.spacing["1"],
   },
   spacer: {
-    height: theme.spacing.dxl,
+    height: theme.spacing["15"],
   },
 }));
 

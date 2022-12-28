@@ -4,44 +4,65 @@ import { NavigationContainer } from "@react-navigation/native";
 import { useTheme } from "@rneui/themed";
 import React from "react";
 
-import HomeScreen from "screens/HomeScreen";
-import SettingsScreen from "src/screens/SettingsScreen";
+import ProfileScreen from "src/screens/ProfileScreen";
+import SearchScreen from "src/screens/SearchScreen";
+import WorkoutScreen from "src/screens/WorkoutScreen";
+import { useShadow } from "src/utils/hooks/useShadow";
 
 const Tab = createBottomTabNavigator();
 
 export default function UserStack() {
   const { theme } = useTheme();
+  const { colors, spacing, borderRadius } = theme;
+  const shadow = useShadow();
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="Home"
+        initialRouteName="Workout"
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: theme.colors.primary,
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: "600",
+          tabBarActiveTintColor: colors.primary900,
+          tabBarStyle: {
+            borderTopColor: colors.primary900,
+            borderColor: colors.primary900,
+            borderTopWidth: spacing["0.5"],
+            borderWidth: spacing["0.5"],
+            height: spacing["16"],
+            marginLeft: spacing["5"],
+            marginRight: spacing["5"],
+            borderRadius: borderRadius.md,
+            paddingBottom: spacing["0"],
+            marginBottom: spacing["10"],
+            ...shadow,
           },
-          tabBarIconStyle: {
-            fontSize: 10,
-          },
+          tabBarItemStyle: {},
+          tabBarShowLabel: false,
         }}
       >
         <Tab.Screen
-          name="Home"
-          component={HomeScreen}
+          name="Profile"
+          component={ProfileScreen}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="home" color={color} size={18} />
+              <Icon name="person" color={color} size={spacing["6"]} />
             ),
           }}
         />
         <Tab.Screen
-          name="Settings"
-          component={SettingsScreen}
+          name="Workout"
+          component={WorkoutScreen}
           options={{
             tabBarIcon: ({ color }) => (
-              <Icon name="settings" color={color} size={18} />
+              <Icon name="barbell-sharp" color={color} size={spacing["6"]} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Search"
+          component={SearchScreen}
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Icon name="search" color={color} size={spacing["6"]} />
             ),
           }}
         />

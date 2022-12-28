@@ -7,6 +7,7 @@ import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import { useBlockStore } from "src/store";
 import { createExercise } from "src/store/actions/exerciseActions";
 import { ExerciseSlice } from "src/utils/types/Exercise";
+
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 type RenderItem = {
@@ -14,6 +15,7 @@ type RenderItem = {
   index: number;
   logExercise: (exercise: ExerciseSlice) => void;
 };
+
 const renderItem = ({ item, index, logExercise }: RenderItem) => {
   return (
     <TouchableOpacity
@@ -40,11 +42,14 @@ export default function ExercisePicker({ closeDialog, onExerciseSelected }) {
     onExerciseSelected(item);
     closeDialog();
   };
+
   const [newExercise, setNewExercise] = useState("");
+
   const addExercise = () => {
     createExercise.dispatch({ name: newExercise });
     setNewExercise("");
   };
+
   return (
     <View style={styles.container}>
       <View

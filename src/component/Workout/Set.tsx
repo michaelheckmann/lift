@@ -174,7 +174,7 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
                         .lighten(40)
                         .saturate(80)
                         .toString()
-                    : colors.grey0,
+                    : colors.background,
                 },
               ]}
             >
@@ -194,15 +194,15 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ spacing, colors, borderRadius }) => ({
   container: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     borderWidth: 1,
     borderColor: "black",
-    borderRadius: theme.border.radius.sm,
-    backgroundColor: theme.colors.white,
+    borderRadius: borderRadius.sm,
+    backgroundColor: colors.white,
   },
   containerItem: {
     flexGrow: 0,
@@ -211,24 +211,24 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
     padding: 0,
     paddingHorizontal: 0,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: spacing.md,
     marginHorizontal: 0,
     marginVertical: 0,
     width: "auto",
     height: "auto",
     justifyContent: "center",
     alignItems: "stretch",
-    backgroundColor: "transparent",
+    backgroundColor: colors.background,
   },
   firstContainerItem: {
-    paddingLeft: theme.spacing.md,
+    paddingLeft: spacing.md,
   },
   lastContainerItem: {
-    paddingRight: theme.spacing.md,
+    paddingRight: spacing.md,
   },
   setNumber: {
-    borderRadius: theme.border.radius.sm,
-    backgroundColor: theme.colors.grey0,
+    borderRadius: borderRadius.sm,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
@@ -236,14 +236,14 @@ const useStyles = makeStyles((theme) => ({
   },
   setNumberText: {
     fontSize: 16,
-    color: theme.colors.black,
+    color: colors.black,
     textAlign: "center",
     fontWeight: "500",
     width: "100%",
   },
   previous: {
-    borderRadius: theme.border.radius.sm,
-    backgroundColor: theme.colors.grey0,
+    borderRadius: borderRadius.sm,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
@@ -251,13 +251,13 @@ const useStyles = makeStyles((theme) => ({
   },
   previousText: {
     fontSize: 16,
-    color: theme.colors.black,
+    color: colors.black,
     textAlign: "center",
     fontWeight: "500",
     lineHeight: 30,
   },
   inputContainer: {
-    backgroundColor: theme.colors.grey0,
+    backgroundColor: colors.background,
     marginHorizontal: 0,
     paddingHorizontal: 0,
     flex: 0,
@@ -273,7 +273,7 @@ const useStyles = makeStyles((theme) => ({
   input: {
     textAlign: "center",
     fontSize: 16,
-    color: theme.colors.black,
+    color: colors.black,
     fontWeight: "500",
     paddingHorizontal: 0,
   },
@@ -282,7 +282,7 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: theme.border.radius.sm,
+    borderRadius: borderRadius.sm,
   },
   icon: {
     width: "100%",

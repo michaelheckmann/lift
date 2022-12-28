@@ -5,7 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
-import DismissKeyboard from "src/component/DismissKeyboard";
+import DismissKeyboard from "src/component/Shared/DismissKeyboard";
 import { auth } from "src/config/firebase";
 import { useToast } from "src/utils/hooks/useToast";
 

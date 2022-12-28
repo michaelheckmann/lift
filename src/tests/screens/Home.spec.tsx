@@ -7,7 +7,7 @@ import {
   waitFor,
 } from "@testing-library/react-native";
 import { navigationProps } from "src/config/jest";
-import HomeScreen from "src/screens/HomeScreen";
+import HomeScreen from "src/screens/WorkoutScreen";
 import { useBlockStore } from "src/store";
 import { defaultMockStore } from "src/store/mock";
 import { renderOnion } from "src/utils/functions/renderOnion";

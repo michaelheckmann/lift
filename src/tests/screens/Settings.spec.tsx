@@ -3,7 +3,7 @@ import React from "react";
 
 import { navigationProps } from "src/config/jest";
 
-import SettingsScreen from "src/screens/SettingsScreen";
+import SettingsScreen from "src/screens/ProfileScreen";
 import { useBlockStore } from "src/store";
 import { defaultMockStore } from "src/store/mock";
 import { renderOnion } from "src/utils/functions/renderOnion";

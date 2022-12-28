@@ -1,28 +1,36 @@
 import { Button, makeStyles } from "@rneui/themed";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
-import WorkoutSheet from "src/component/WorkoutSheet";
+import { View } from "react-native";
+import WorkoutSheet from "src/component/Workout/WorkoutSheet";
 import { createWorkout } from "src/store/actions/workoutsActions";
 import { getWorkoutbyId } from "src/utils/functions/dataFetching";
 import { useActiveWorkout } from "src/utils/hooks/useActiveWorkout";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 
-export default function HomeScreen() {
+export default function WorkoutScreen() {
   const styles = useStyles();
   const [isWorkoutSheetOpen, setIsWorkoutSheetOpen] = useState(false);
   const [workoutData, setWorkoutData] = useState<Partial<WorkoutJoin>>({});
   const activeWorkoutId = useActiveWorkout();
 
+  /**
+   * It gets the workout by id, sets the workout data to the active workout,
+   * and then opens the workout sheet
+   */
   const setExistingWorkout = () => {
     const activeWorkout = getWorkoutbyId(activeWorkoutId);
     setWorkoutData(activeWorkout);
     setIsWorkoutSheetOpen(true);
   };
 
+  /**
+   * When the user clicks the "Blank Workout" button, we dispatch an action to create a new workout,
+   * and then we open the workout sheet
+   */
   const createBlankWorkout = () => {
     const id = createWorkout.dispatch();
-    console.log("CREATE WORKOUT ID", id);
+    // console.log("CREATE WORKOUT ID", id);
     setWorkoutData({ id });
     setIsWorkoutSheetOpen(true);
   };
@@ -35,8 +43,9 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>Active Workout: {activeWorkoutId || "new workout"}</Text>
-      <Text>{JSON.stringify(workoutData, null, 4)}</Text>
+      {/* Spacer Placeholder */}
+      <View style={styles.spacer} />
+
       <Button
         title="Blank workout"
         buttonStyle={styles.button}
@@ -55,18 +64,22 @@ export default function HomeScreen() {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ spacing, colors }) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: spacing["6"],
   },
   button: {
-    marginBottom: theme.spacing.xxl,
+    marginBottom: spacing["15"],
   },
   buttonContainer: {
     width: "100%",
-    paddingHorizontal: theme.spacing.cxl,
+    marginBottom: spacing["10"],
+  },
+  spacer: {
+    flex: 1,
   },
 }));

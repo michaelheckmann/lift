@@ -85,9 +85,8 @@ export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
       {/* Sets */}
       <View>
         {fields.map((set, setIndex) => (
-          <View style={{ marginBottom: 10 }}>
+          <View key={set.fieldId} style={{ marginBottom: 10 }}>
             <Swipeable
-              key={set.fieldId}
               renderRightActions={() =>
                 renderLeftActions(() => handleRemoveSet(setIndex))
               }
@@ -97,7 +96,6 @@ export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
               containerStyle={{ backgroundColor: "red" }}
             >
               <Set
-                key={set.fieldId}
                 set={set}
                 setIndex={setIndex}
                 setGroupIndex={setGroupIndex}
@@ -138,45 +136,45 @@ const SetHeader = ({ styles }) => {
   );
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ colors, spacing, borderRadius }) => ({
   container: {
     width: "100%",
-    marginBottom: theme.spacing.xxl,
+    marginBottom: spacing["4"],
   },
   header: {
     flexDirection: "row",
-    marginBottom: theme.spacing.xl,
+    marginBottom: spacing.xl,
   },
   headerButton: {
-    backgroundColor: theme.colors.grey0,
-    borderWidth: theme.border.width.md,
-    borderColor: theme.colors.grey3,
+    backgroundColor: colors.background,
+    borderWidth: spacing["0.5"],
+    borderColor: colors.grey3,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: theme.border.radius.sm,
+    borderRadius: borderRadius.sm,
   },
   headerButtonText: {
     fontWeight: "bold",
     fontSize: 16,
-    color: theme.colors.black,
+    color: colors.black,
   },
-  setGroupOptions: { height: 55, width: 55, marginRight: theme.spacing.xl },
+  setGroupOptions: { height: 55, width: 55, marginRight: spacing.xl },
   exercise: {
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
     flex: 1,
   },
   setsHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
   setsHeaderText: {
     fontWeight: "bold",
     fontSize: 16,
-    color: theme.colors.black,
+    color: colors.black,
   },
   input: {
     height: 40,

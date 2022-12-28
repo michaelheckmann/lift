@@ -16,6 +16,7 @@ const Onion = ({ children }) => {
   );
 };
 
+// The renderOnion function is used to wrap the component under test with the Onion component.
 export function renderOnion(
   ui: React.ReactElement<unknown, string | React.JSXElementConstructor<any>>,
   options: RenderOptions = {}
