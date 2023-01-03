@@ -5,6 +5,19 @@
 [X] => CRON job user create, attach user_id
 [X] => PM2 postgrest
 [X] => Postgrest public key file and update
+[X] => Fix Animation Bottom Slider
 
-[ ] => Fix Animation Bottom Slider
+[x] => Dark mode
+[X] => Full row success state
+[ ] => Reorder setgroups
+[ ] => Rename
+[ ] => Timer
+[ ] => Previous exercise
+[ ] => Rework login
+[ ] => Replace exercise
+
+[ ] => Custom keyboard overlay
+
+[ ] => Nice success transition
+[ ] => New Exercise Polish
 [ ] =>

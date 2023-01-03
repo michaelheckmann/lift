@@ -1,25 +1,31 @@
-import { Button, Dialog, makeStyles } from "@rneui/themed";
+import { Button, makeStyles } from "@rneui/themed";
 import React, { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { Dimensions, Text, TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Modal from "react-native-modal";
 import { createSetGroup } from "src/store/actions/setgroupActions";
 import { updateWorkout } from "src/store/actions/workoutsActions";
 import { ExerciseSlice } from "src/utils/types/Exercise";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
-import ExercisePicker from "./ExercisePicker";
-import SetGroup from "./SetGroup";
-
-const WINDOW_WIDTH = Dimensions.get("window").width;
+import ExercisePicker from "../ExercisePicker/ExercisePicker";
+import SetGroup from "../SetGroup/SetGroup";
+import WorkoutHeader from "./WorkoutHeader";
 
 type Props = {
   onClose: () => void;
   workoutData: Partial<WorkoutJoin>;
   isCollapsed: boolean;
+  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function Workout({ onClose, workoutData, isCollapsed }: Props) {
-  const styles = useStyles({ isCollapsed });
+export default function Workout({
+  onClose,
+  workoutData,
+  isCollapsed,
+  setExpanded,
+}: Props) {
+  const styles = useStyles();
   const [exercisePickerVisible, setExercisePickerVisible] = useState(false);
 
   /* Definition of the form values and methods */
@@ -58,6 +64,14 @@ export default function Workout({ onClose, workoutData, isCollapsed }: Props) {
     reset(workoutData);
   }, [workoutData]);
 
+  const openExercisePicker = () => {
+    setExercisePickerVisible(true);
+  };
+
+  const closeExercisePicker = () => {
+    setExercisePickerVisible(false);
+  };
+
   const handleFinish = () => {
     updateWorkout.dispatch({
       id: workoutData.id,
@@ -69,16 +83,11 @@ export default function Workout({ onClose, workoutData, isCollapsed }: Props) {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.headerContainer}>
-        {!isCollapsed && (
-          <View style={styles.dragAffordanceContainer}>
-            <View style={styles.dragAffordance} />
-          </View>
-        )}
-        <TouchableOpacity onPress={handleFinish}>
-          <Text style={styles.heading}>Workout</Text>
-        </TouchableOpacity>
-      </View>
+      <WorkoutHeader
+        isCollapsed={isCollapsed}
+        handleFinish={handleFinish}
+        setExpanded={setExpanded}
+      />
 
       {!isCollapsed && (
         <KeyboardAwareScrollView
@@ -97,73 +106,66 @@ export default function Workout({ onClose, workoutData, isCollapsed }: Props) {
           })}
 
           <Button
-            style={{ marginBottom: 20 }}
-            title="append setgroup"
-            onPress={() => setExercisePickerVisible(true)}
+            title="Add Exercise"
+            buttonStyle={styles.addSetGroupButton}
+            titleStyle={styles.addSetGroupButtonText}
+            onPress={openExercisePicker}
           />
           <Button
-            style={{ marginBottom: 20 }}
-            title="submit"
+            title="Finish Workout"
+            buttonStyle={styles.finishWorkoutButton}
+            titleStyle={styles.finishWorkoutButtonText}
             onPress={handleSubmit(onSubmit)}
           />
         </KeyboardAwareScrollView>
       )}
 
       {/* Exercise Picker Dialog */}
-      <Dialog
-        animationType="fade"
+      <Modal
         isVisible={exercisePickerVisible}
-        onBackdropPress={() => setExercisePickerVisible(false)}
-        overlayStyle={styles.exercisePickerOverlay}
+        onBackdropPress={closeExercisePicker}
+        backdropOpacity={0.7}
+        animationInTiming={300}
+        animationIn="zoomIn"
+        animationOut="slideOutDown"
+        animationOutTiming={300}
       >
         <ExercisePicker
-          closeDialog={() => setExercisePickerVisible(false)}
+          closeDialog={closeExercisePicker}
           onExerciseSelected={handleAppendSetGroup}
         />
-      </Dialog>
+      </Modal>
     </View>
   );
 }
 
-const useStyles = makeStyles(
-  ({ colors, spacing, borderRadius }, { isCollapsed }) => ({
+const useStyles = makeStyles((theme) => {
+  const { colors, spacing, mode } = theme;
+  return {
     container: {
       flex: 1,
-      // backgroundColor: "blue",
-      backgroundColor: colors.background,
       alignItems: "center",
       justifyContent: "flex-start",
       width: "100%",
     },
-    headerContainer: {
-      width: "100%",
-      marginBottom: isCollapsed ? 0 : spacing[2],
-    },
-    heading: {
-      fontSize: spacing["7"],
-      fontWeight: "bold",
-      marginTop: isCollapsed ? 0 : spacing[4],
-      marginBottom: isCollapsed ? 0 : spacing[4],
-    },
-    dragAffordanceContainer: {
-      width: "100%",
-    },
-    dragAffordance: {
-      height: spacing["1.5"],
-      width: spacing["12"],
-      backgroundColor: colors.gray300,
-      borderRadius: 5,
-      marginTop: spacing["0.5"],
-      marginBottom: spacing["0.5"],
-      alignSelf: "center",
-    },
     form: {
       width: "100%",
     },
-    exercisePickerOverlay: {
-      // backgroundColor: "blue",
-      width: WINDOW_WIDTH * 0.9,
-      borderRadius: borderRadius.sm,
+    addSetGroupButton: {
+      backgroundColor: colors.background,
+      borderColor: colors.text,
+      marginBottom: spacing["4"],
     },
-  })
-);
+    addSetGroupButtonText: {
+      color: colors.text,
+    },
+    finishWorkoutButton: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+      marginBottom: spacing["4"],
+    },
+    finishWorkoutButtonText: {
+      color: mode === "dark" ? colors.primary900 : colors.primary50,
+    },
+  };
+});

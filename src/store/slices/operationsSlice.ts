@@ -1,9 +1,9 @@
 // Types
 
-import { ActionType } from "src/utils/types/lib/Actions";
+import { Action } from "src/utils/types/lib/Actions";
 
 export type QueueItem = {
-  obj: ActionType;
+  obj: Action<any>;
   arg: any;
 };
 
@@ -23,6 +23,7 @@ type OperationsConfigType = {
 
 type OperationsGlobalType = {
   userId?: string;
+  workoutSheetCollapsed?: boolean;
 };
 
 export type OperationSlice = {
@@ -50,5 +51,6 @@ export const operationsState: OperationSlice = {
   },
   global: {
     userId: undefined,
+    workoutSheetCollapsed: undefined,
   },
 };

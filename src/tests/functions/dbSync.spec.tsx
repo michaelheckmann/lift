@@ -8,14 +8,14 @@ import {
   toggleOnlineTesting,
 } from "../../store/actions/operationsActions";
 import { createWorkout } from "../../store/actions/workoutsActions";
-import { useBlockStore } from "../../store/index";
+import { useLiftStore } from "../../store/index";
 import { defaultMockStore } from "../../store/mock";
 import { dispatchAction } from "../../store/utils";
 import { WorkoutCreate } from "../../utils/types/Workout";
 
 describe("Database sync", () => {
   beforeEach(() => {
-    useBlockStore.setState(defaultMockStore);
+    useLiftStore.setState(defaultMockStore);
   });
 
   afterEach(() => {
@@ -26,7 +26,7 @@ describe("Database sync", () => {
   it("dispatches an action correctly", async () => {
     toggleOnlineTesting(); // Enable online testing
 
-    const { isOnline } = useBlockStore.getState().operations.config.testing;
+    const { isOnline } = useLiftStore.getState().operations.config.testing;
     expect(isOnline.enabled).toBe(true);
     expect(isOnline.value).toBe(true);
 
@@ -55,8 +55,8 @@ describe("Database sync", () => {
     toggleOnlineTesting(); // Enable online testing
     toggleOnlineState(); // Set online state to false
 
-    const { isOnline } = useBlockStore.getState().operations.config.testing;
-    const { queue } = useBlockStore.getState().operations;
+    const { isOnline } = useLiftStore.getState().operations.config.testing;
+    const { queue } = useLiftStore.getState().operations;
     const queueLength = queue.length;
     expect(isOnline.enabled).toBe(true);
     expect(isOnline.value).toBe(false);
@@ -77,7 +77,7 @@ describe("Database sync", () => {
     expect(spyCommit).not.toHaveBeenCalledWith(pl);
     expect(spyDBSync).not.toHaveBeenCalled();
 
-    expect(useBlockStore.getState().operations.queue.length).toBe(
+    expect(useLiftStore.getState().operations.queue.length).toBe(
       queueLength + 1
     );
   });
@@ -95,10 +95,10 @@ describe("Database sync", () => {
       .mockImplementation(() => Promise.resolve(true));
 
     const getQueueLength = () =>
-      useBlockStore.getState().operations.queue.length;
+      useLiftStore.getState().operations.queue.length;
     const initQueueLength = getQueueLength();
 
-    const { isOnline } = useBlockStore.getState().operations.config.testing;
+    const { isOnline } = useLiftStore.getState().operations.config.testing;
     expect(isOnline.enabled).toBe(true);
     expect(isOnline.value).toBe(false);
 

@@ -1,5 +1,5 @@
 import update from "immutability-helper";
-import { useBlockStore } from "src/store";
+import { useLiftStore } from "src/store";
 import { updateRemoteState } from "src/utils/functions/dbSync";
 import { generateUUID } from "src/utils/functions/generateUUID";
 import { Action } from "src/utils/types/lib/Actions";
@@ -23,7 +23,7 @@ export const createWorkout: CreateWorkoutType = {
   dispatch() {
     const workout: WorkoutCreate = {
       id: generateUUID("wrk"),
-      user_id: useBlockStore.getState().operations.global.userId,
+      user_id: useLiftStore.getState().operations.global.userId,
     };
     dispatchAction(createWorkout, workout);
     return workout.id;
@@ -38,8 +38,8 @@ export const createWorkout: CreateWorkoutType = {
       archived: false,
       created_at: new Date(),
     };
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         workouts: {
           $push: [newWorkout],
         },
@@ -47,11 +47,11 @@ export const createWorkout: CreateWorkoutType = {
     );
   },
   _rollback({ id }, _) {
-    const index = useBlockStore
+    const index = useLiftStore
       .getState()
       .workouts.findIndex((workout) => workout.id === id);
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         workouts: {
           $splice: [[index, 1]],
         },
@@ -72,8 +72,8 @@ export const updateWorkout: Action<WorkoutUpdate> = {
     );
   },
   _store(args) {
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         workouts: {
           $apply: (workouts: WorkoutSlice[]) =>
             workouts.map((workout) => {
@@ -90,11 +90,11 @@ export const updateWorkout: Action<WorkoutUpdate> = {
     );
   },
   _rollback({ id }, _) {
-    const index = useBlockStore
+    const index = useLiftStore
       .getState()
       .workouts.findIndex((workout) => workout.id === id);
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         workouts: {
           $splice: [[index, 1]],
         },

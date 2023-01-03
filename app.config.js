@@ -3,8 +3,8 @@ import "dotenv/config";
 export default {
   expo: {
     owner: "michaelheckmann",
-    name: "block",
-    slug: "block-workout-app",
+    name: "lift",
+    slug: "lift-workout-app",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",

@@ -23,7 +23,7 @@ export interface StoreType {
   workouts: WorkoutSlice[];
 }
 
-export const useBlockStore = create<StoreType>()(
+export const useLiftStore = create<StoreType>()(
   logger(
     // subscribeWithSelector is necessary for sub function in useCustomTheme
     // https://docs.pmnd.rs/zustand/recipes/recipes#reading/writing-state-and-reacting-to-changes-outside-of-components
@@ -38,7 +38,7 @@ export const useBlockStore = create<StoreType>()(
           workouts: workoutsState,
         }),
         {
-          name: "block-storage",
+          name: "lift-storage",
           getStorage: () => AsyncStorage,
         }
       )
@@ -47,10 +47,10 @@ export const useBlockStore = create<StoreType>()(
 );
 
 /**
- * It resets the state of the block store to the default state
+ * It resets the state of the lift store to the default state
  */
 export const resetState = () => {
-  useBlockStore.setState({
+  useLiftStore.setState({
     settings: settingsState,
     operations: operationsState,
     exercises: exercisesState,

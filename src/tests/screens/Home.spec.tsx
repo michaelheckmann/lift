@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react-native";
 import { navigationProps } from "src/config/jest";
 import HomeScreen from "src/screens/WorkoutScreen";
-import { useBlockStore } from "src/store";
+import { useLiftStore } from "src/store";
 import { defaultMockStore } from "src/store/mock";
 import { renderOnion } from "src/utils/functions/renderOnion";
 
@@ -17,7 +17,7 @@ const spy = jest.spyOn(useActiveWorkout, "useActiveWorkout");
 
 describe("Previous Workout", () => {
   beforeAll(() => {
-    useBlockStore.setState(defaultMockStore);
+    useLiftStore.setState(defaultMockStore);
   });
   afterEach(cleanup);
 
@@ -50,7 +50,7 @@ describe("<HomeScreen />", () => {
 
 describe("Blank Workout", () => {
   beforeAll(() => {
-    useBlockStore.setState(defaultMockStore);
+    useLiftStore.setState(defaultMockStore);
   });
 
   it("creates a new workout, if the blank workout button is pressed", async () => {
@@ -59,20 +59,20 @@ describe("Blank Workout", () => {
       .spyOn(dbSync, "updateRemoteState")
       .mockImplementation(() => Promise.resolve(true));
     spy.mockReturnValue(undefined);
-    const workoutLength = useBlockStore.getState().workouts.length;
+    const workoutLength = useLiftStore.getState().workouts.length;
     renderOnion(<HomeScreen {...navigationProps} />);
 
     fireEvent.press(screen.getByText("Blank workout", { exact: false }));
 
-    expect(useBlockStore.getState().workouts).toHaveLength(workoutLength + 1);
+    expect(useLiftStore.getState().workouts).toHaveLength(workoutLength + 1);
   });
 
   it("does not create a new workout, if the blank workout button is pressed and there is an active workout", async () => {
     spy.mockReturnValue("wrk1");
-    const workoutLength = useBlockStore.getState().workouts.length;
+    const workoutLength = useLiftStore.getState().workouts.length;
     renderOnion(<HomeScreen {...navigationProps} />);
 
     fireEvent.press(screen.getByText("Blank workout", { exact: false }));
-    expect(useBlockStore.getState().workouts).toHaveLength(workoutLength);
+    expect(useLiftStore.getState().workouts).toHaveLength(workoutLength);
   });
 });

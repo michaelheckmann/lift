@@ -1,4 +1,4 @@
-import { useBlockStore } from "src/store";
+import { useLiftStore } from "src/store";
 import { updateRemoteState } from "src/utils/functions/dbSync";
 
 import update from "immutability-helper";
@@ -19,8 +19,8 @@ export const updateSettings: Action<SettingUpdate> = {
     );
   },
   _store(args) {
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         settings: {
           $merge: args,
         },
@@ -29,8 +29,8 @@ export const updateSettings: Action<SettingUpdate> = {
   },
   _rollback(_, previousState) {
     const previous = previousState.settings;
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         settings: {
           $merge: previous,
         },

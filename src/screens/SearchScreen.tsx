@@ -1,5 +1,4 @@
 import { makeStyles } from "@rneui/themed";
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { ActivityIndicator, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,15 +15,14 @@ export default function SearchScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Text>Search screen</Text>
-      <StatusBar style="auto" />
     </SafeAreaView>
   );
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
-    // backgroundColor: theme.colors.background,
+    backgroundColor: colors.background50,
     alignItems: "center",
     justifyContent: "center",
     // paddingHorizontal: theme.spacing.md,

@@ -1,9 +1,16 @@
 import { IoniconType } from "./../types/lib/Ionicon";
 
+export type OptionLabel =
+  | "Light Mode"
+  | "Dark Mode"
+  | "Halloween"
+  | "KG"
+  | "LBS"
+  | "Logout";
+
 export type OptionType = {
-  label: string;
+  label: OptionLabel;
   icon: IoniconType;
-  onPress: (args?: any) => any;
 };
 
 /**
@@ -17,41 +24,30 @@ export function getOptionGroups(): OptionType[][] {
       {
         label: "Light Mode",
         icon: "sunny-outline",
-        onPress: () => {
-          console.log("Light Mode");
-        },
       },
       {
         label: "Dark Mode",
         icon: "moon-outline",
-        onPress: () => {
-          console.log("Dark Mode");
-        },
+      },
+      {
+        label: "Halloween",
+        icon: "skull-outline",
       },
     ],
     [
       {
         label: "KG",
         icon: "body-outline",
-        onPress: () => {
-          console.log("KG");
-        },
       },
       {
         label: "LBS",
         icon: "body-outline",
-        onPress: () => {
-          console.log("LBS");
-        },
       },
     ],
     [
       {
         label: "Logout",
         icon: "log-out-outline",
-        onPress: () => {
-          console.log("KG");
-        },
       },
     ],
   ];

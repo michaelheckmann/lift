@@ -4,7 +4,7 @@ import React from "react";
 import { navigationProps } from "src/config/jest";
 
 import SettingsScreen from "src/screens/ProfileScreen";
-import { useBlockStore } from "src/store";
+import { useLiftStore } from "src/store";
 import { defaultMockStore } from "src/store/mock";
 import { renderOnion } from "src/utils/functions/renderOnion";
 
@@ -20,7 +20,7 @@ describe("<SettingsScreen />", () => {
   });
 
   it("should change the theme", async () => {
-    const getTheme = () => useBlockStore.getState().settings.theme;
+    const getTheme = () => useLiftStore.getState().settings.theme;
     renderOnion(<SettingsScreen {...navigationProps} />);
 
     expect(getTheme()).toBe(defaultMockStore.settings.theme);

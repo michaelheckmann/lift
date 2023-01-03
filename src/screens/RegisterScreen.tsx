@@ -1,7 +1,6 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button, Input, makeStyles } from "@rneui/themed";
-import { StatusBar } from "expo-status-bar";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
@@ -67,7 +66,6 @@ const SignUpScreen: React.FC<NativeStackScreenProps<any>> = ({
         />
 
         <Button title="Sign up" loading={isLoading} onPress={signUp} />
-        <StatusBar style="auto" />
       </KeyboardAvoidingView>
     </DismissKeyboard>
   );

@@ -1,14 +1,13 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button, makeStyles, Text } from "@rneui/themed";
 import { useFonts } from "expo-font";
-import { StatusBar } from "expo-status-bar";
 import React, { FC } from "react";
 import { View } from "react-native";
 
 const WelcomeScreen: FC<NativeStackScreenProps<any>> = ({ navigation }) => {
   const styles = useStyles();
   const [fontsLoaded] = useFonts({
-    OkineBlackOutline: require("assets/fonts/OkineBlackOutline.otf"),
+    HubotSansBlackNarrow: require("assets/fonts/HubotSansBlackNarrow.otf"),
   });
 
   if (!fontsLoaded) {
@@ -18,63 +17,78 @@ const WelcomeScreen: FC<NativeStackScreenProps<any>> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.headingContainer}>
-        <Text style={styles.heading}>Welcome to</Text>
-        <Text style={[styles.heading, styles.headingLogo]}>BLOCK</Text>
+        <Text style={styles.heading}>LIFT</Text>
       </View>
-      <Button
-        title="Login"
-        buttonStyle={styles.button}
-        containerStyle={styles.buttonContainer}
-        onPress={() => navigation.navigate("Login")}
-      />
-      <Button
-        title="Register"
-        type="outline"
-        containerStyle={styles.buttonContainer}
-        buttonStyle={[styles.button, styles.buttonOutline]}
-        onPress={() => navigation.navigate("Register")}
-      />
-      <View style={styles.spacer} />
-      <StatusBar style="auto" />
+      <View style={styles.buttonStack}>
+        <Button
+          title="Login"
+          titleStyle={styles.buttonText}
+          containerStyle={[styles.buttonContainer, styles.buttonTop]}
+          buttonStyle={styles.button}
+          onPress={() => navigation.navigate("Login")}
+        />
+        <Button
+          title="Register"
+          type="outline"
+          titleStyle={styles.buttonOutlineText}
+          containerStyle={styles.buttonContainer}
+          buttonStyle={[styles.button, styles.buttonOutline]}
+          onPress={() => navigation.navigate("Register")}
+        />
+      </View>
     </View>
   );
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ spacing, colors, mode }) => ({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.white,
+    backgroundColor: colors.background,
   },
   headingContainer: {
     width: "100%",
     alignItems: "center",
-    marginBottom: theme.spacing["15"],
+    marginBottom: spacing["15"],
   },
   heading: {
-    fontSize: 40,
+    fontSize: spacing["36"],
     fontWeight: "bold",
-    color: theme.colors.black,
+    color: colors.text,
+    fontFamily: "HubotSansBlackNarrow",
   },
-  headingLogo: {
-    fontFamily: "OkineBlackOutline",
-    fontSize: 58,
+  buttonStack: {
+    flexDirection: "column",
+    marginTop: spacing["16"],
+    marginBottom: spacing["16"],
+    width: "100%",
+    paddingHorizontal: spacing["4"],
   },
   button: {
-    marginBottom: theme.spacing["15"],
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  buttonText: {
+    color: mode === "dark" ? colors.primary900 : colors.primary50,
+  },
+  buttonOutlineText: {
+    color: colors.text,
   },
   buttonContainer: {
     width: "100%",
-    paddingHorizontal: theme.spacing["15"],
+    paddingHorizontal: spacing["15"],
+  },
+  buttonTop: {
+    marginBottom: spacing["8"],
   },
   buttonOutline: {
     backgroundColor: "transparent",
-    borderColor: theme.colors.gray300,
-    borderWidth: theme.spacing["1"],
+    borderColor: colors.text,
+    borderWidth: spacing["0.5"],
   },
   spacer: {
-    height: theme.spacing["15"],
+    height: spacing["15"],
   },
 }));
 

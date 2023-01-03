@@ -5,7 +5,7 @@ import {
   ServerIncludeUpdate,
 } from "./lib/Helpers";
 
-export type Themes = "light" | "dark";
+export type Themes = "light" | "dark" | "halloween";
 
 // Mirrors the shape on the server
 type Setting = {

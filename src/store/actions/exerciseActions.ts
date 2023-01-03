@@ -1,5 +1,5 @@
 import update from "immutability-helper";
-import { useBlockStore } from "src/store";
+import { useLiftStore } from "src/store";
 import { updateRemoteState } from "src/utils/functions/dbSync";
 import { generateUUID } from "src/utils/functions/generateUUID";
 import { ExerciseCreate, ExerciseSlice } from "src/utils/types/Exercise";
@@ -18,7 +18,7 @@ export const createExercise: Action<
   dispatch(args) {
     const exercise: ExerciseCreate = {
       id: generateUUID("xrc"),
-      user_id: useBlockStore.getState().operations.global.userId,
+      user_id: useLiftStore.getState().operations.global.userId,
       ...args,
     };
     dispatchAction<ExerciseCreate>(createExercise, exercise);
@@ -33,8 +33,8 @@ export const createExercise: Action<
       name,
       archived: false,
     };
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         exercises: {
           $push: [newExercise],
         },
@@ -42,11 +42,11 @@ export const createExercise: Action<
     );
   },
   _rollback({ id }, _) {
-    const index = useBlockStore
+    const index = useLiftStore
       .getState()
       .exercises.findIndex((exercise) => exercise.id === id);
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         exercises: {
           $splice: [[index, 1]],
         },

@@ -1,4 +1,4 @@
-import { useBlockStore } from "src/store";
+import { useLiftStore } from "src/store";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 
 // These functions are used to fetch complex data from the local store.
@@ -10,7 +10,7 @@ import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
  * @returns An object with the workout, setGroups, sets, and exercises.
  */
 export function getWorkoutbyId(id: string): WorkoutJoin {
-  const { workouts, setGroups, sets, exercises } = useBlockStore.getState();
+  const { workouts, setGroups, sets, exercises } = useLiftStore.getState();
   const workout = workouts.find((workout) => {
     return workout.id === id;
   });

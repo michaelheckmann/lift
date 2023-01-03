@@ -44,14 +44,14 @@ export async function updateRemoteState<T>(
     body: JSON.stringify(body),
   };
 
-  return fetch(`http://block.ceto.live/api/${endpoint}`, options)
+  return fetch(`http://lift.ceto.live/api/${endpoint}`, options)
     .then(async (res) => {
       // console.log("RES STATUS", res.status);
       // console.log("RES MESSAGE", await res.text());
       return res.status < 400;
     })
     .catch((err) => {
-      console.log("🚀 ~ file: sendToBackend.ts ~ line 38 ~ err", err);
+      console.log("🚀 ~ file: dbSync.ts ~ line 38 ~ err", err);
       return false;
     });
 }

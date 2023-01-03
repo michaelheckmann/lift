@@ -1,5 +1,5 @@
 import update from "immutability-helper";
-import { useBlockStore } from "src/store";
+import { useLiftStore } from "src/store";
 import { updateRemoteState } from "src/utils/functions/dbSync";
 import { generateUUID } from "src/utils/functions/generateUUID";
 import { Action } from "src/utils/types/lib/Actions";
@@ -36,8 +36,8 @@ export const createSetGroup: Action<
       workout_id,
       archived: false,
     };
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         setGroups: {
           $push: [newSetGroup],
         },
@@ -45,11 +45,11 @@ export const createSetGroup: Action<
     );
   },
   _rollback({ id }, _) {
-    const index = useBlockStore
+    const index = useLiftStore
       .getState()
       .setGroups.findIndex((setGroup) => setGroup.id === id);
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         setGroups: {
           $splice: [[index, 1]],
         },

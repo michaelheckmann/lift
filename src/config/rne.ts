@@ -5,23 +5,23 @@ const { colors, borderRadius, spacing } = defaultTheme;
 
 export const theme = createTheme({
   lightColors: colors,
+  darkColors: colors,
   spacing,
   borderRadius,
   components: {
     Button: {
       buttonStyle: {
-        backgroundColor: colors.background,
+        backgroundColor: colors.primary,
         borderRadius: borderRadius.sm,
         paddingVertical: spacing["3"],
         paddingHorizontal: spacing["5"],
         width: "100%",
-        borderColor: colors.gray900,
+        borderColor: colors.border,
         borderWidth: spacing["0.5"],
       },
       titleStyle: {
-        color: colors.gray900,
+        color: colors.primary900,
         fontWeight: "bold",
-        letterSpacing: 1.2,
       },
       loadingProps: {
         color: colors.black,
@@ -31,22 +31,25 @@ export const theme = createTheme({
       },
     },
     Input: {
+      containerStyle: {
+        paddingHorizontal: 0,
+      },
       inputContainerStyle: {
         borderRadius: borderRadius.sm,
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.xl,
+        paddingVertical: spacing["1"],
+        paddingHorizontal: spacing["3"],
         backgroundColor: "transparent",
-        borderColor: colors.gray100,
-        borderWidth: spacing["1.5"],
-        borderBottomWidth: spacing["1"],
-        // width: "100%",
-        minWidth: 300,
+        borderColor: colors.border,
+        borderWidth: spacing["0.5"],
+        borderBottomWidth: spacing["0.5"],
+        minWidth: 0,
       },
+      placeholderTextColor: colors.text,
       inputStyle: {
-        color: colors.black,
+        color: colors.text,
       },
       leftIconContainerStyle: {
-        marginRight: spacing.md,
+        marginRight: spacing["1"],
       },
     },
   },

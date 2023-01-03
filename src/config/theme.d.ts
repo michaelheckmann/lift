@@ -3,17 +3,7 @@ import "@rneui/themed";
 // Custom extension of the default types
 declare module "@rneui/themed" {
   export interface Colors {
-    gray50: string;
-    gray100: string;
-    gray200: string;
-    gray300: string;
-    gray400: string;
-    gray500: string;
-    gray600: string;
-    gray700: string;
-    gray800: string;
-    gray900: string;
-
+    primary: string;
     primary50: string;
     primary100: string;
     primary200: string;
@@ -25,28 +15,23 @@ declare module "@rneui/themed" {
     primary800: string;
     primary900: string;
 
-    secondary50: string;
-    secondary100: string;
-    secondary200: string;
-    secondary300: string;
-    secondary400: string;
-    secondary500: string;
-    secondary600: string;
-    secondary700: string;
-    secondary800: string;
-    secondary900: string;
+    background: string;
+    foreground: string;
+    border: string;
+    text: string;
 
-    accent50: string;
-    accent100: string;
-    accent200: string;
-    accent300: string;
-    accent400: string;
-    accent500: string;
-    accent600: string;
-    accent700: string;
-    accent800: string;
-    accent900: string;
+    gray50: string;
+    gray100: string;
+    gray200: string;
+    gray300: string;
+    gray400: string;
+    gray500: string;
+    gray600: string;
+    gray700: string;
+    gray800: string;
+    gray900: string;
 
+    success: string;
     success50: string;
     success100: string;
     success200: string;
@@ -58,6 +43,7 @@ declare module "@rneui/themed" {
     success800: string;
     success900: string;
 
+    warning: string;
     warning50: string;
     warning100: string;
     warning200: string;
@@ -69,6 +55,7 @@ declare module "@rneui/themed" {
     warning800: string;
     warning900: string;
 
+    error: string;
     error50: string;
     error100: string;
     error200: string;
@@ -79,6 +66,18 @@ declare module "@rneui/themed" {
     error700: string;
     error800: string;
     error900: string;
+
+    accent: string;
+    accent50: string;
+    accent100: string;
+    accent200: string;
+    accent300: string;
+    accent400: string;
+    accent500: string;
+    accent600: string;
+    accent700: string;
+    accent800: string;
+    accent900: string;
   }
 
   export interface ThemeSpacing {
@@ -128,5 +127,6 @@ declare module "@rneui/themed" {
 
   export interface Theme {
     borderRadius: BorderRadius;
+    themeName: string;
   }
 }

@@ -1,12 +1,12 @@
 import update from "immutability-helper";
 import { Action } from "src/utils/types/lib/Actions";
-import { StoreType, useBlockStore } from "..";
+import { StoreType, useLiftStore } from "..";
 import { QueueItem } from "../slices/operationsSlice";
 
 // Actions
 export const enqueueOperation = (operation: QueueItem) => {
-  useBlockStore.setState(
-    update(useBlockStore.getState(), {
+  useLiftStore.setState(
+    update(useLiftStore.getState(), {
       operations: {
         queue: {
           $push: [operation],
@@ -17,10 +17,10 @@ export const enqueueOperation = (operation: QueueItem) => {
 };
 
 export const dequeueOperation = () => {
-  const preState = useBlockStore.getState();
-  const { obj, arg } = useBlockStore.getState().operations.queue[0];
-  useBlockStore.setState(
-    update(useBlockStore.getState(), {
+  const preState = useLiftStore.getState();
+  const { obj, arg } = useLiftStore.getState().operations.queue[0];
+  useLiftStore.setState(
+    update(useLiftStore.getState(), {
       operations: {
         queue: {
           $splice: [[0, 1]],
@@ -32,8 +32,8 @@ export const dequeueOperation = () => {
 };
 
 export const toggleOnlineState = () => {
-  useBlockStore.setState(
-    update(useBlockStore.getState(), {
+  useLiftStore.setState(
+    update(useLiftStore.getState(), {
       operations: {
         config: {
           testing: {
@@ -48,8 +48,8 @@ export const toggleOnlineState = () => {
 };
 
 export const toggleOnlineTesting = () => {
-  useBlockStore.setState(
-    update(useBlockStore.getState(), {
+  useLiftStore.setState(
+    update(useLiftStore.getState(), {
       operations: {
         config: {
           testing: {
@@ -64,12 +64,26 @@ export const toggleOnlineTesting = () => {
 };
 
 export const setUserId = (userId: string | undefined) => {
-  useBlockStore.setState(
-    update(useBlockStore.getState(), {
+  useLiftStore.setState(
+    update(useLiftStore.getState(), {
       operations: {
         global: {
           userId: {
             $set: userId,
+          },
+        },
+      },
+    })
+  );
+};
+
+export const setWorkoutSheetCollapsed = (value) => {
+  useLiftStore.setState(
+    update(useLiftStore.getState(), {
+      operations: {
+        global: {
+          workoutSheetCollapsed: {
+            $set: value,
           },
         },
       },

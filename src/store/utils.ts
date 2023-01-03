@@ -1,6 +1,6 @@
 import NetInfo from "@react-native-community/netinfo";
-import { useBlockStore } from "src/store";
-import { ActionType } from "src/utils/types/lib/Actions";
+import { useLiftStore } from "src/store";
+import { Action } from "src/utils/types/lib/Actions";
 import { commitAction, enqueueOperation } from "./actions/operationsActions";
 
 /**
@@ -9,12 +9,12 @@ import { commitAction, enqueueOperation } from "./actions/operationsActions";
  * @param obj - The action object that you want to dispatch.
  * @param {T} arg - The argument passed to the action
  */
-export const dispatchAction = async <T>(obj: ActionType, arg: T) => {
-  const preState = useBlockStore.getState();
+export const dispatchAction = async <T>(obj: Action<T>, arg: T) => {
+  const preState = useLiftStore.getState();
   obj._store(arg);
 
   const { enabled, value } =
-    useBlockStore.getState().operations.config.testing.isOnline;
+    useLiftStore.getState().operations.config.testing.isOnline;
   let isOnline = value;
 
   if (!enabled) {

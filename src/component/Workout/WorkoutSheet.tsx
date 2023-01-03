@@ -1,5 +1,4 @@
 import { Portal, PortalHost } from "@gorhom/portal";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { makeStyles, useTheme } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { Dimensions, useWindowDimensions } from "react-native";
@@ -13,7 +12,8 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import Workout from "./Workout";
+import { setWorkoutSheetCollapsed } from "src/store/actions/operationsActions";
+import Workout from "./Workout/Workout";
 
 const WINDOW_WIDTH = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -36,16 +36,19 @@ const TIMING_CONFIG = {
 
 export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
   const styles = useStyles();
-  const tabBarHeight = useBottomTabBarHeight();
   const dimensions = useWindowDimensions();
   const { theme } = useTheme();
+  // theme.spacing["10"] = Tab.Navigator margin bottom
+  // theme.spacing["16"] = Tab.Navigator height
+  const tabBarHeight = theme.spacing["10"] + theme.spacing["16"];
 
   const top = useSharedValue(dimensions.height);
   const bottom = useSharedValue(0);
   const shadowOpacity = useSharedValue(0.2);
-  const borderRadius = useSharedValue(theme.borderRadius.sm);
+  const borderRadius = useSharedValue(theme.borderRadius.md);
   const borderWidth = useSharedValue(0);
   const backDropOpacity = useSharedValue(0);
+  const margin = useSharedValue(0);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -57,7 +60,10 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
       borderTopLeftRadius: withTiming(borderRadius.value, TIMING_CONFIG),
       borderTopRightRadius: withTiming(borderRadius.value, TIMING_CONFIG),
       borderTopWidth: withTiming(borderWidth.value, TIMING_CONFIG),
-      borderBottomWidth: withTiming(borderWidth.value, TIMING_CONFIG),
+      borderRightWidth: withTiming(borderWidth.value, TIMING_CONFIG),
+      borderLeftWidth: withTiming(borderWidth.value, TIMING_CONFIG),
+      marginRight: withTiming(margin.value, TIMING_CONFIG),
+      marginLeft: withTiming(margin.value, TIMING_CONFIG),
     };
   });
 
@@ -75,9 +81,10 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
     top.value = WINDOW_HEIGHT - HEIGHT_COLLAPSED;
     bottom.value = tabBarHeight;
     shadowOpacity.value = 0;
-    borderRadius.value = 0;
-    borderWidth.value = 1;
+    borderRadius.value = theme.borderRadius.md;
+    borderWidth.value = theme.spacing["0.5"];
     backDropOpacity.value = withTiming(0, TIMING_CONFIG);
+    margin.value = theme.spacing["5"];
     setIsCollapsed(true);
   };
 
@@ -85,9 +92,10 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
     top.value = WINDOW_HEIGHT - HEIGHT_EXPANDED;
     bottom.value = 0;
     shadowOpacity.value = 0.1;
-    borderRadius.value = 20;
+    borderRadius.value = theme.borderRadius.md;
     borderWidth.value = 0;
     backDropOpacity.value = withTiming(0.2, TIMING_CONFIG);
+    margin.value = 0;
     setIsCollapsed(false);
   };
 
@@ -136,6 +144,9 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
       );
       backDropOpacity.value = withTiming(0, TIMING_CONFIG);
     }
+    // This is stored in the ZUSTAND store
+    // so that TAB NAVIGATOR can access it
+    setWorkoutSheetCollapsed(isOpen);
   }, [isOpen]);
 
   return (
@@ -154,6 +165,7 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
               onClose={onClose}
               workoutData={workoutData}
               isCollapsed={isCollapsed}
+              setExpanded={setExpanded}
             />
           </Animated.View>
         </PanGestureHandler>
@@ -163,13 +175,13 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     position: "absolute",
     left: 0,
     right: 0,
-    backgroundColor: theme.colors.background,
-    shadowColor: theme.colors.black,
+    backgroundColor: colors.background,
+    shadowColor: colors.black,
     shadowOffset: {
       width: 0,
       height: -5,
@@ -179,6 +191,7 @@ const useStyles = makeStyles((theme) => ({
     padding: 10,
     justifyContent: "center",
     alignItems: "center",
+    borderColor: colors.border,
   },
   backDrop: {
     position: "absolute",

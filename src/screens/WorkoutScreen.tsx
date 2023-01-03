@@ -1,8 +1,8 @@
 import { Button, makeStyles } from "@rneui/themed";
-import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import WorkoutSheet from "src/component/Workout/WorkoutSheet";
+import { setWorkoutSheetCollapsed } from "src/store/actions/operationsActions";
 import { createWorkout } from "src/store/actions/workoutsActions";
 import { getWorkoutbyId } from "src/utils/functions/dataFetching";
 import { useActiveWorkout } from "src/utils/hooks/useActiveWorkout";
@@ -35,6 +35,12 @@ export default function WorkoutScreen() {
     setIsWorkoutSheetOpen(true);
   };
 
+  const closeWorkoutSheet = () => {
+    setIsWorkoutSheetOpen(false);
+    // This is needed to control the tab navgiator style
+    setWorkoutSheetCollapsed(undefined);
+  };
+
   useEffect(() => {
     if (activeWorkoutId && !isWorkoutSheetOpen) {
       setExistingWorkout();
@@ -49,6 +55,7 @@ export default function WorkoutScreen() {
       <Button
         title="Blank workout"
         buttonStyle={styles.button}
+        titleStyle={styles.buttonTitle}
         containerStyle={styles.buttonContainer}
         onPress={createBlankWorkout}
         disabled={isWorkoutSheetOpen || !!activeWorkoutId}
@@ -56,15 +63,14 @@ export default function WorkoutScreen() {
 
       <WorkoutSheet
         isOpen={isWorkoutSheetOpen}
-        onClose={() => setIsWorkoutSheetOpen(false)}
+        onClose={closeWorkoutSheet}
         workoutData={workoutData}
       />
-      <StatusBar style="auto" />
     </View>
   );
 }
 
-const useStyles = makeStyles(({ spacing, colors }) => ({
+const useStyles = makeStyles(({ spacing, colors, mode }) => ({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -73,7 +79,11 @@ const useStyles = makeStyles(({ spacing, colors }) => ({
     paddingHorizontal: spacing["6"],
   },
   button: {
-    marginBottom: spacing["15"],
+    borderWidth: 0,
+    backgroundColor: colors.primary,
+  },
+  buttonTitle: {
+    color: mode === "dark" ? colors.primary900 : colors.primary50,
   },
   buttonContainer: {
     width: "100%",

@@ -1,5 +1,5 @@
 import update from "immutability-helper";
-import { useBlockStore } from "src/store";
+import { useLiftStore } from "src/store";
 import { updateRemoteState } from "src/utils/functions/dbSync";
 import { generateUUID } from "src/utils/functions/generateUUID";
 import { Action } from "src/utils/types/lib/Actions";
@@ -33,8 +33,8 @@ export const createSet: Action<SetCreate, CreateSetDispatchArgs> = {
       done: false,
       archived: false,
     };
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         sets: {
           $push: [newSet],
         },
@@ -42,11 +42,11 @@ export const createSet: Action<SetCreate, CreateSetDispatchArgs> = {
     );
   },
   _rollback({ id }, _) {
-    const index = useBlockStore
+    const index = useLiftStore
       .getState()
       .sets.findIndex((set) => set.id === id);
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         sets: {
           $splice: [[index, 1]],
         },
@@ -63,8 +63,8 @@ export const updateSet: Action<SetUpdate> = {
     return updateRemoteState<SetUpdate>(`sets?id=eq.${id}`, "PATCH", args);
   },
   _store(args) {
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         sets: {
           $apply: (sets: SetSlice[]) =>
             sets.map((set) => {
@@ -80,14 +80,24 @@ export const updateSet: Action<SetUpdate> = {
       })
     );
   },
-  _rollback({ id }, _) {
-    const index = useBlockStore
-      .getState()
-      .sets.findIndex((set) => set.id === id);
-    useBlockStore.setState(
-      update(useBlockStore.getState(), {
+  _rollback({ id }, previousState) {
+    const previous = previousState.sets.find((set) => set.id === id);
+    if (!previous) {
+      return;
+    }
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
         sets: {
-          $splice: [[index, 1]],
+          $apply: (sets: SetSlice[]) =>
+            sets.map((set) => {
+              if (set.id === id) {
+                return {
+                  ...set,
+                  ...previous,
+                };
+              }
+              return set;
+            }),
         },
       })
     );

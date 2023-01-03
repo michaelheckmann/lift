@@ -1,6 +1,5 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import { Button, Input, makeStyles } from "@rneui/themed";
-import { StatusBar } from "expo-status-bar";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
@@ -66,19 +65,33 @@ const LoginScreen = () => {
           leftIcon={<Icon name="ios-lock-closed" size={18} />}
         />
 
-        <Button title="Sign in" onPress={signIn} loading={isLoading} />
-        <StatusBar style="auto" />
+        <Button
+          title="Sign in"
+          onPress={signIn}
+          containerStyle={styles.button}
+          buttonStyle={styles.button}
+          titleStyle={styles.buttonText}
+          loading={isLoading}
+        />
       </KeyboardAvoidingView>
     </DismissKeyboard>
   );
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(({ spacing, colors }) => ({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: theme.spacing.md,
+    paddingHorizontal: spacing["4"],
+  },
+  button: {
+    width: "100%",
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  buttonText: {
+    color: colors.gray900,
   },
 }));
 

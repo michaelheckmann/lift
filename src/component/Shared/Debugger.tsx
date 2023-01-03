@@ -7,7 +7,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import { resetState, StoreType, useBlockStore } from "src/store";
+import { resetState, StoreType, useLiftStore } from "src/store";
 import {
   toggleOnlineState,
   toggleOnlineTesting,
@@ -17,7 +17,7 @@ const selector = (state) => state.operations;
 
 export default function Debugger() {
   const [isOpen, setIsOpen] = useState(false);
-  const operations: StoreType["operations"] = useBlockStore(selector);
+  const operations: StoreType["operations"] = useLiftStore(selector);
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
