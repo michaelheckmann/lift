@@ -1,74 +1,107 @@
-import Icon from "@expo/vector-icons/Ionicons";
-import MIcon from "@expo/vector-icons/MaterialIcons";
-import { Button, makeStyles, useTheme } from "@rneui/themed";
-import React from "react";
+import MIcon from "@expo/vector-icons/MaterialCommunityIcons";
+import { makeStyles, useTheme } from "@rneui/themed";
+import React, { useEffect, useMemo } from "react";
+import { FieldArrayWithId, UseFormReturn, useWatch } from "react-hook-form";
 import {
-  FieldArrayWithId,
-  useFieldArray,
-  UseFormReturn,
-} from "react-hook-form";
-import { Text, TouchableOpacity, View } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import { createSet, updateSet } from "src/store/actions/setActions";
-import { getThemeConfig } from "src/utils/functions/getThemeConfig";
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { RenderItemParams } from "react-native-draggable-flatlist";
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { getSetGroupContentHeight } from "src/utils/functions/getSetGroupHeights";
 import { useShadow } from "src/utils/hooks/useShadow";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
-import Set from "../Set/Set";
-import SetHeader from "./SetHeader";
+import SetGroupContent from "./SetGroupContent";
+
+// This should be in the SetGroupList component
+// but it's here to avoid a circular dependency
+export const listAnimationConfig = {
+  duration: 200,
+  easing: Easing.ease,
+};
 
 type Props = {
-  setGroup: FieldArrayWithId<WorkoutJoin, "setGroups", "id">;
-  setGroupIndex: number;
+  renderItemProps: RenderItemParams<
+    FieldArrayWithId<WorkoutJoin, "setGroups", "fieldId">
+  >;
   methods: UseFormReturn<WorkoutJoin, any>;
+  reorderingItem: number;
+  setReorderingItem: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const renderLeftActions = ({ removeSet, styles }) => {
-  return (
-    <RectButton style={styles.removeBox} onPress={removeSet}>
-      <Icon name="trash-bin" size={20} color="white" />
-    </RectButton>
-  );
-};
-
-export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
+export default function SetGroup({
+  methods,
+  renderItemProps,
+  reorderingItem,
+  setReorderingItem,
+}: Props) {
   const shadow = useShadow();
-  const styles = useStyles({ shadow });
+  const styles = useStyles({
+    shadow,
+  });
   const { theme } = useTheme();
 
-  /* Definition of the form values and methods */
-  const { control } = methods;
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: `setGroups.${setGroupIndex}.sets` as "setGroups.0.sets",
-    keyName: "fieldId",
+  const { item: setGroup, getIndex, drag, isActive } = renderItemProps;
+  const setGroupIndex = getIndex();
+
+  // This is necessary to make sure the set group content
+  // is rendered correctly when the user has reordered the list
+  // Else there might be artifacts where the addSet button is
+  // misaligned
+  const showSetGroupContent = useMemo(() => {
+    return reorderingItem === -1;
+  }, [reorderingItem]);
+
+  const path = `setGroups.${setGroupIndex}.sets` as `setGroups.0.sets`;
+  const numberOfSets = useWatch({
+    control: methods.control,
+    name: path,
+  }).length;
+
+  const setGroupContentHeight = useSharedValue(0);
+
+  useEffect(() => {
+    if (reorderingItem === -1) {
+      setGroupContentHeight.value = getSetGroupContentHeight(
+        theme.spacing,
+        numberOfSets
+      );
+    } else {
+      setGroupContentHeight.value = 0;
+    }
+  }, [numberOfSets, reorderingItem]);
+
+  const handleLongPress = () => {
+    setReorderingItem(setGroupIndex);
+  };
+
+  const handleDrag = () => {
+    "worklet";
+    if (reorderingItem === setGroupIndex) {
+      runOnJS(drag)();
+    }
+  };
+
+  const setGroupContentAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      height: withTiming(
+        setGroupContentHeight.value,
+        listAnimationConfig,
+        handleDrag
+      ),
+    };
   });
 
-  const handleAppendSet = () => {
-    const defaultSet = {
-      weight: 0,
-      reps: 0,
-      done: false,
-      archived: false,
-      setgroup_id: setGroup.id,
-    };
-    const id = createSet.dispatch({
-      setgroup_id: defaultSet.setgroup_id,
-    });
-
-    append({ ...defaultSet, id });
-  };
-
-  const handleRemoveSet = (setIndex) => {
-    remove(setIndex);
-    updateSet.dispatch({
-      id: fields[setIndex].id,
-      archived: true,
-    });
-  };
-
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container]}>
       {/* Set Group Header */}
       <View style={styles.header}>
         <TouchableOpacity style={[styles.headerButton, styles.setGroupOptions]}>
@@ -77,55 +110,31 @@ export default function SetGroup({ setGroup, setGroupIndex, methods }: Props) {
         <TouchableOpacity style={[styles.headerButton, styles.exercise]}>
           <Text style={styles.headerButtonText}>{setGroup.exercise.name}</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Set Header */}
-      <SetHeader />
-
-      {/* Sets */}
-      <View style={styles.setGroupContainer}>
-        {fields.map((set, setIndex) => (
-          <View key={set.fieldId} style={styles.set}>
-            <Swipeable
-              renderRightActions={() =>
-                renderLeftActions({
-                  removeSet: () => handleRemoveSet(setIndex),
-                  styles,
-                })
-              }
-              rightThreshold={40}
-              overshootFriction={8}
-              shouldCancelWhenOutside
-              containerStyle={{
-                backgroundColor: theme.colors.error,
-              }}
-            >
-              <Set
-                set={set}
-                setIndex={setIndex}
-                setGroupIndex={setGroupIndex}
-                methods={methods}
-              />
-            </Swipeable>
-          </View>
-        ))}
-      </View>
-
-      <Button
-        buttonStyle={styles.addSetButton}
-        titleStyle={styles.addSetButtonText}
-        title="Add set"
-        icon={
+        <TouchableWithoutFeedback
+          style={styles.dragAffordance}
+          onLongPress={handleLongPress}
+          disabled={isActive}
+        >
           <MIcon
-            name="add"
-            size={theme.spacing["5"]}
-            color={theme.colors.text}
-            style={styles.addSetIcon}
+            name="drag"
+            size={theme.spacing["8"]}
+            color={theme.colors.gray200}
           />
-        }
-        onPress={handleAppendSet}
-      />
-    </View>
+        </TouchableWithoutFeedback>
+      </View>
+
+      <Animated.View
+        style={[styles.setGroupContentContainer, setGroupContentAnimatedStyle]}
+      >
+        {showSetGroupContent && (
+          <SetGroupContent
+            methods={methods}
+            setGroupIndex={setGroupIndex}
+            setGroup={setGroup}
+          />
+        )}
+      </Animated.View>
+    </Animated.View>
   );
 }
 
@@ -134,7 +143,6 @@ const useStyles = makeStyles((theme, { shadow }) => {
   return {
     container: {
       width: "100%",
-      marginBottom: spacing["8"],
     },
     header: {
       flexDirection: "row",
@@ -142,17 +150,26 @@ const useStyles = makeStyles((theme, { shadow }) => {
       borderWidth: spacing["0.5"],
       borderColor: colors.border,
       borderRadius: borderRadius.sm,
+      backgroundColor: colors.background,
+      height: spacing["11"],
+      justifyContent: "center",
+      alignItems: "center",
+      ...shadow,
     },
     headerButton: {
       backgroundColor: colors.background,
       justifyContent: "center",
       alignItems: "center",
-      ...shadow,
+      height: "100%",
     },
     headerButtonText: {
       fontWeight: "bold",
       fontSize: spacing["4"],
       color: colors.text,
+    },
+    dragAffordance: {
+      justifyContent: "center",
+      alignItems: "center",
     },
     setGroupOptions: {
       height: spacing["10"],
@@ -165,44 +182,9 @@ const useStyles = makeStyles((theme, { shadow }) => {
       alignItems: "flex-start",
       borderLeftWidth: spacing["0.5"],
       borderColor: colors.border,
-      ...shadow,
     },
-    setGroupContainer: {
-      borderWidth: spacing["0.5"],
-      borderColor: colors.border,
-      borderRadius: borderRadius.sm,
-    },
-    input: {
-      height: 40,
-      margin: 12,
-      borderWidth: 1,
-      borderColor: "black",
-    },
-    addSetButton: {
-      paddingVertical: spacing["2"],
-      // borderColor: colors.gray600,
-      borderWidth: 0,
-      backgroundColor: getThemeConfig(
-        "SetGroup.addSetButton.backgroundColor",
-        theme
-      ),
-      marginTop: spacing["4"],
-    },
-    addSetButtonText: {
-      fontSize: spacing["4"],
-      color: colors.text,
-    },
-    addSetIcon: {
-      marginRight: spacing["0.5"],
-    },
-    removeBox: {
-      backgroundColor: colors.error,
-      width: spacing["20"],
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    set: {
-      marginBottom: spacing["0"],
+    setGroupContentContainer: {
+      overflow: "hidden",
     },
   };
 });

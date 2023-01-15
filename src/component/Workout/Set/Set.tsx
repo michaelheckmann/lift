@@ -148,7 +148,8 @@ const useStyles = makeStyles((theme, { done }) => {
   const { colors, spacing, borderRadius } = theme;
   return {
     container: {
-      flex: 1,
+      // flex: 1,
+      height: spacing["12"],
       flexDirection: "row",
       justifyContent: "space-between",
       backgroundColor: colors.background,

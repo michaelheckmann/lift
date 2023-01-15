@@ -175,7 +175,7 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
   );
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors, spacing }) => ({
   container: {
     position: "absolute",
     left: 0,
@@ -188,10 +188,9 @@ const useStyles = makeStyles(({ colors }) => ({
     },
     shadowRadius: 8,
     elevation: 5,
-    padding: 10,
+    padding: spacing["2.5"],
     justifyContent: "center",
     alignItems: "center",
-    borderColor: colors.border,
   },
   backDrop: {
     position: "absolute",

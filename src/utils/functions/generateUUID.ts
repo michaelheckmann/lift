@@ -2,15 +2,24 @@
 // The UUID prefix is generated based on the first 3 consonants of the database type
 // If the word has three characters or less, the first 3 characters are used
 export function generateUUID(prefix: string) {
+  const id = generateRandomID();
+  const number = generateRandomNumber(100);
+  return `${prefix}_${id}_${number}`;
+}
+
+function generateRandomID() {
   let d = new Date().getTime();
   const id = "xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    let r = Math.random() * 16; //random number between 0 and 16
+    let r = Math.random() * 16;
     r = (d + r) % 16 | 0;
     d = Math.floor(d / 16);
     return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
   });
-  const number = Math.floor(Math.random() * 100).toString();
-  return `${prefix}_${id}_${number}`;
+  return id;
+}
+
+function generateRandomNumber(max: number) {
+  return Math.floor(Math.random() * max).toString();
 }
 
 // This is only relevant if the file is called from /scripts directory

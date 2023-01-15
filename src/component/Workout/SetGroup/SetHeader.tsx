@@ -67,8 +67,8 @@ const useStyles = makeStyles(({ colors, spacing }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing.md,
     paddingHorizontal: spacing["1"],
+    height: spacing["9"],
   },
   setsHeaderText: {
     fontWeight: "500",

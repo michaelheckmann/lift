@@ -10,7 +10,7 @@
 [x] => Dark mode
 [X] => Full row success state
 [ ] => Reorder setgroups
-[ ] => Rename
+[X] => Rename
 [ ] => Timer
 [ ] => Previous exercise
 [ ] => Rework login

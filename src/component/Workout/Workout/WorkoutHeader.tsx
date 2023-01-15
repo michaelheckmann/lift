@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme, { isCollapsed }) => {
     headerContainer: {
       width: "100%",
       marginBottom: isCollapsed ? 0 : spacing[2],
-      height: isCollapsed ? spacing["20"] : "auto",
+      height: isCollapsed ? spacing["20"] : spacing["20"],
       justifyContent: isCollapsed ? "center" : "space-between",
       alignItems: isCollapsed ? "center" : "stretch",
     },

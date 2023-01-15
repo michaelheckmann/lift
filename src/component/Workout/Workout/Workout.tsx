@@ -1,15 +1,13 @@
-import { Button, makeStyles } from "@rneui/themed";
+import { makeStyles } from "@rneui/themed";
 import React, { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
 import { createSetGroup } from "src/store/actions/setgroupActions";
-import { updateWorkout } from "src/store/actions/workoutsActions";
 import { ExerciseSlice } from "src/utils/types/Exercise";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 import ExercisePicker from "../ExercisePicker/ExercisePicker";
-import SetGroup from "../SetGroup/SetGroup";
+import SetGroupList from "./SetGroupList";
 import WorkoutHeader from "./WorkoutHeader";
 
 type Props = {
@@ -26,6 +24,7 @@ export default function Workout({
   setExpanded,
 }: Props) {
   const styles = useStyles();
+
   const [exercisePickerVisible, setExercisePickerVisible] = useState(false);
 
   /* Definition of the form values and methods */
@@ -33,13 +32,16 @@ export default function Workout({
     defaultValues: useMemo(() => workoutData, [workoutData]),
   });
   const { control, handleSubmit, reset } = methods;
-  const { fields, append } = useFieldArray({
+  const { fields, append, move } = useFieldArray({
     control,
     name: "setGroups",
     keyName: "fieldId",
   });
 
   const onSubmit = (data) => console.log(JSON.stringify(data, null, 4));
+  const submit = () => {
+    handleSubmit(onSubmit)();
+  };
 
   const handleAppendSetGroup = (exercise: ExerciseSlice) => {
     const defaultSetGroup = {
@@ -73,11 +75,12 @@ export default function Workout({
   };
 
   const handleFinish = () => {
-    updateWorkout.dispatch({
-      id: workoutData.id,
-      done: true,
-    });
-    onClose();
+    // updateWorkout.dispatch({
+    //   id: workoutData.id,
+    //   done: true,
+    // });
+    // onClose();
+    console.log(methods.getValues().setGroups.map((s) => s.exercise.name));
   };
 
   return (
@@ -90,34 +93,13 @@ export default function Workout({
       />
 
       {!isCollapsed && (
-        <KeyboardAwareScrollView
-          showsVerticalScrollIndicator={false}
-          style={styles.form}
-        >
-          {fields.map((setGroup, setGroupIndex) => {
-            return (
-              <SetGroup
-                key={setGroup.fieldId}
-                setGroup={setGroup}
-                setGroupIndex={setGroupIndex}
-                methods={methods}
-              />
-            );
-          })}
-
-          <Button
-            title="Add Exercise"
-            buttonStyle={styles.addSetGroupButton}
-            titleStyle={styles.addSetGroupButtonText}
-            onPress={openExercisePicker}
-          />
-          <Button
-            title="Finish Workout"
-            buttonStyle={styles.finishWorkoutButton}
-            titleStyle={styles.finishWorkoutButtonText}
-            onPress={handleSubmit(onSubmit)}
-          />
-        </KeyboardAwareScrollView>
+        <SetGroupList
+          fields={fields}
+          methods={methods}
+          move={move}
+          openExercisePicker={openExercisePicker}
+          submit={submit}
+        />
       )}
 
       {/* Exercise Picker Dialog */}
@@ -140,32 +122,12 @@ export default function Workout({
 }
 
 const useStyles = makeStyles((theme) => {
-  const { colors, spacing, mode } = theme;
   return {
     container: {
       flex: 1,
       alignItems: "center",
       justifyContent: "flex-start",
       width: "100%",
-    },
-    form: {
-      width: "100%",
-    },
-    addSetGroupButton: {
-      backgroundColor: colors.background,
-      borderColor: colors.text,
-      marginBottom: spacing["4"],
-    },
-    addSetGroupButtonText: {
-      color: colors.text,
-    },
-    finishWorkoutButton: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
-      marginBottom: spacing["4"],
-    },
-    finishWorkoutButtonText: {
-      color: mode === "dark" ? colors.primary900 : colors.primary50,
     },
   };
 });
