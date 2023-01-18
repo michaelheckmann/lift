@@ -10,16 +10,21 @@ import {
 import { View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { SharedValue } from "react-native-reanimated";
 import { createSet, updateSet } from "src/store/actions/setActions";
+import { getSetHeight } from "src/utils/functions/getSetGroupLayouts";
 import { getThemeConfig } from "src/utils/functions/getThemeConfig";
+import { setListLayoutValue } from "src/utils/functions/listLayoutHelpers";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 import Set from "../Set/Set";
+import { ListItemLayout } from "../Workout/Workout";
 import SetHeader from "./SetHeader";
 
 type Props = {
   setGroup: FieldArrayWithId<WorkoutJoin, "setGroups", "id">;
   setGroupIndex: number;
   methods: UseFormReturn<WorkoutJoin, any>;
+  listLayout: SharedValue<ListItemLayout[]>;
 };
 
 const renderLeftActions = ({ removeSet, styles }) => {
@@ -34,6 +39,7 @@ export default function SetGroupContent({
   methods,
   setGroupIndex,
   setGroup,
+  listLayout,
 }: Props) {
   const styles = useStyles();
   const { theme } = useTheme();
@@ -58,11 +64,54 @@ export default function SetGroupContent({
       setgroup_id: defaultSet.setgroup_id,
     });
 
+    listLayout.value = listLayout.value.map((listLayout, index) => {
+      // If the item is the one to which the set is appended,
+      // we just need to increase the height of the item
+      if (index === setGroupIndex) {
+        const height = listLayout.relaxed.height + getSetHeight(theme.spacing);
+        return setListLayoutValue(listLayout, "relaxed", "height", height);
+      }
+      // If the item is below the one to which the set is appended,
+      // i.e. later in the list, we need to increase the top of the item,
+      // i.e. shift everything done
+      else if (index > setGroupIndex) {
+        const top = listLayout.relaxed.top + getSetHeight(theme.spacing);
+        return setListLayoutValue(listLayout, "relaxed", "top", top);
+      }
+      // If the item is above the one to which the set is appended,
+      // i.e. earlier in the list, we don't need to do anything
+      else {
+        return listLayout;
+      }
+    });
+
     append({ ...defaultSet, id });
   };
 
   const handleRemoveSet = (setIndex) => {
     remove(setIndex);
+
+    listLayout.value = listLayout.value.map((listLayout, index) => {
+      // If the item is the one to which the set is removed,
+      // we just need to decrease the height of the item
+      if (index === setGroupIndex) {
+        const height = listLayout.relaxed.height - getSetHeight(theme.spacing);
+        return setListLayoutValue(listLayout, "relaxed", "height", height);
+      }
+      // If the item is below the one to which the set is removed,
+      // i.e. later in the list, we need to decrease the top of the item,
+      // i.e. shift everything done
+      else if (index > setGroupIndex) {
+        const top = listLayout.relaxed.top - getSetHeight(theme.spacing);
+        return setListLayoutValue(listLayout, "relaxed", "top", top);
+      }
+      // If the item is above the one to which the set is removed,
+      // i.e. earlier in the list, we don't need to do anything
+      else {
+        return listLayout;
+      }
+    });
+
     updateSet.dispatch({
       id: fields[setIndex].id,
       archived: true,

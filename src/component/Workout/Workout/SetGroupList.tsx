@@ -1,26 +1,29 @@
 import { makeStyles, useTheme } from "@rneui/themed";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FieldArrayWithId,
   UseFieldArrayMove,
   UseFormReturn,
 } from "react-hook-form";
 import { View } from "react-native";
-import DraggableFlatList, {
-  RenderItemParams,
-} from "react-native-draggable-flatlist";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Animated, {
+  SharedValue,
+  useAnimatedReaction,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import {
-  getSetGroupContentHeight,
   getSetGroupFooterHeight,
-} from "src/utils/functions/getSetGroupHeights";
+  getSetGroupHeaderHeight,
+} from "src/utils/functions/getSetGroupLayouts";
+import { setListLayoutValue } from "src/utils/functions/listLayoutHelpers";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
-import SetGroup, { listAnimationConfig } from "../SetGroup/SetGroup";
+import SetGroup from "../SetGroup/SetGroup";
 import SetGroupListFooter from "./SetGroupListFooter";
+import { ListItemLayout } from "./Workout";
 
 type Props = {
   fields: FieldArrayWithId<WorkoutJoin, "setGroups", "fieldId">[];
@@ -28,6 +31,7 @@ type Props = {
   move: UseFieldArrayMove;
   openExercisePicker: () => void;
   submit: () => void;
+  listLayout: SharedValue<ListItemLayout[]>;
 };
 
 export default function SetGroupList({
@@ -36,106 +40,89 @@ export default function SetGroupList({
   move,
   openExercisePicker,
   submit,
+  listLayout,
 }: Props) {
   const styles = useStyles();
   const { theme } = useTheme();
+  const headerHeight = getSetGroupHeaderHeight(theme.spacing);
 
-  const [reorderingItem, setReorderingItem] = useState(-1);
+  const [reorderIndex, setReorderIndex] = useState(-1);
 
-  const defaultHeight = {
-    // Nothing is rendered by default in the header
-    top: 0,
-    // The footer has a fixed height
-    bottom: getSetGroupFooterHeight(theme.spacing),
-  };
+  // This is used to store the order of the list items
+  // while they are being reordered
+  const tightLayoutOrder = useSharedValue<number[]>([]);
 
-  const spacerTopHeight = useSharedValue(defaultHeight.top);
-  const spacerBottomHeight = useSharedValue(defaultHeight.bottom);
+  // This is used to compute and store the height of the entire list
+  const height = useDerivedValue(() => {
+    return listLayout.value.reduce((acc, item) => acc + item.relaxed.height, 0);
+  });
 
-  // This code is used to calculate the height of each set group
-  // when the user is reordering them. This is used to add a spacer
-  // before the first and after the last list item. This is necessary
-  // to prevent the list from jumping when the user drags an item
-  useEffect(() => {
-    if (reorderingItem !== -1) {
-      let top = 0;
-      let bottom = 0;
+  const setGroupFooterHeight = getSetGroupFooterHeight(theme.spacing);
 
-      methods.getValues().setGroups.forEach((setGroup, index) => {
-        if (index < reorderingItem) {
-          top += getSetGroupContentHeight(theme.spacing, setGroup.sets.length);
-        } else {
-          bottom += getSetGroupContentHeight(
-            theme.spacing,
-            setGroup.sets.length
-          );
-        }
-      });
-      console.log("top", top + defaultHeight.top);
-      console.log("bottom", bottom + defaultHeight.bottom);
-      spacerTopHeight.value = top + defaultHeight.top;
-      spacerBottomHeight.value = bottom + defaultHeight.bottom;
-    } else {
-      spacerTopHeight.value = defaultHeight.top;
-      spacerBottomHeight.value = defaultHeight.bottom;
+  // This is used to update the order of the list items
+  // every time a new item is added or removed
+  useAnimatedReaction(
+    () => listLayout.value,
+    (layout, previousLayout) => {
+      if (layout && previousLayout && layout.length !== previousLayout.length)
+        tightLayoutOrder.value = layout.map((_, i) => i);
     }
-  }, [reorderingItem]);
-
-  const handleDragEnd = ({ from, to }) => {
-    move(from, to);
-    setReorderingItem(-1);
-  };
-
-  const renderItem = useCallback(
-    (
-      renderItemProps: RenderItemParams<
-        FieldArrayWithId<WorkoutJoin, "setGroups", "fieldId">
-      >
-    ) => (
-      <SetGroup
-        key={renderItemProps.item.fieldId}
-        renderItemProps={renderItemProps}
-        methods={methods}
-        reorderingItem={reorderingItem}
-        setReorderingItem={setReorderingItem}
-      />
-    ),
-    [reorderingItem, setReorderingItem]
   );
 
-  const spacerStyleTop = useAnimatedStyle(() => {
+  useEffect(() => {
+    // If the reorder index is not -1, then we are in the process of reordering
+    // the items. Every set group has a relaxed and a tight layout. The tight
+    // layout is used when the set group is being reordered. The tight layout
+    // is a copy of the relaxed layout, but with a top value that is
+    // calculated based on the top value of the reordered item and the
+    // index of the item in the list.
+    if (reorderIndex !== -1) {
+      listLayout.value = listLayout.value.map((item, i) => {
+        const referenceTop = listLayout.value[reorderIndex].relaxed.top;
+        const top = referenceTop + (i - reorderIndex) * headerHeight;
+        return setListLayoutValue(item, "tight", "top", top);
+      });
+    } else {
+      // Reset the order of the tight list items so that
+      // they are in the same order as the relaxed list items
+      tightLayoutOrder.value = listLayout.value.map((_, i) => i);
+    }
+  }, [reorderIndex]);
+
+  const animatedStyles = useAnimatedStyle(() => {
     return {
-      height: withTiming(spacerTopHeight.value, listAnimationConfig),
+      // theme.spacing["12"] is used as a padding on the bottom
+      // of the scroll view
+      height: withTiming(height.value + setGroupFooterHeight),
     };
   });
 
-  const renderSpacerTop = useCallback(() => {
-    return <Animated.View style={[styles.spacer, spacerStyleTop]} />;
-  }, [spacerStyleTop]);
-
-  const renderSpacerBottom = useCallback(() => {
-    return (
-      <SetGroupListFooter
-        isReordering={reorderingItem !== -1}
-        height={spacerBottomHeight}
-        {...{ openExercisePicker, submit }}
-      />
-    );
-  }, [reorderingItem, spacerBottomHeight]);
-
   return (
     <View style={styles.form}>
-      <DraggableFlatList
-        data={fields}
-        keyExtractor={({ fieldId }) => fieldId}
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={400}
-        containerStyle={{ flex: 1 }}
-        onDragEnd={handleDragEnd}
-        renderItem={renderItem}
-        ListHeaderComponent={renderSpacerTop}
-        ListFooterComponent={renderSpacerBottom}
-      />
+      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+        <Animated.View style={[styles.scrollView, animatedStyles]}>
+          {fields.map((setGroup, index) => (
+            <SetGroup
+              key={setGroup.fieldId}
+              methods={methods}
+              setGroup={setGroup}
+              setGroupIndex={index}
+              move={move}
+              listLayout={listLayout}
+              tightLayoutOrder={tightLayoutOrder}
+              reorderIndex={reorderIndex}
+              setReorderIndex={setReorderIndex}
+            />
+          ))}
+          <SetGroupListFooter
+            isReordering={reorderIndex !== -1}
+            top={height}
+            height={setGroupFooterHeight}
+            openExercisePicker={openExercisePicker}
+            submit={submit}
+          />
+        </Animated.View>
+      </KeyboardAwareScrollView>
     </View>
   );
 }
@@ -146,9 +133,9 @@ const useStyles = makeStyles(() => {
       flex: 1,
       width: "100%",
     },
-    spacer: {
+    scrollView: {
+      position: "relative",
       width: "100%",
-      backgroundColor: "#FAFAD2",
     },
   };
 });

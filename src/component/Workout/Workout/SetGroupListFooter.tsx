@@ -5,33 +5,33 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import { useTiming } from "react-native-redash";
-import { listAnimationConfig } from "../SetGroup/SetGroup";
 
 type Props = {
   isReordering: boolean;
-  height: SharedValue<number>;
+  top: SharedValue<number>;
+  height: number;
   openExercisePicker: () => void;
   submit: () => void;
 };
 
 export default function SetGroupListFooter({
   isReordering,
+  top,
   height,
   openExercisePicker,
   submit,
 }: Props) {
   const styles = useStyles();
-  const transition = useTiming(!isReordering, listAnimationConfig);
   const opacityStyle = useAnimatedStyle(() => {
     return {
-      opacity: transition.value,
+      opacity: withTiming(isReordering ? 0 : 1),
     };
   });
   // While we're reording, we want to hide the spacer content
   const spacerStyleBottom = useAnimatedStyle(() => {
     return {
-      height: withTiming(height.value, listAnimationConfig),
+      top: withTiming(top.value),
+      height: withTiming(isReordering ? 0 : height),
     };
   });
 
@@ -61,7 +61,6 @@ const useStyles = makeStyles((theme) => {
     spacer: {
       width: "100%",
       overflow: "hidden",
-      backgroundColor: "#9370D8",
     },
     addSetGroupButton: {
       backgroundColor: colors.background,

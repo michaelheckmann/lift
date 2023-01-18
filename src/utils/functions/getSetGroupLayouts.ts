@@ -1,22 +1,30 @@
 import { ThemeSpacing } from "@rneui/themed";
 
-/**
- * It takes in a spacing object and a number of sets and returns the height of a set group
- * @param {ThemeSpacing} spacing - ThemeSpacing
- * @param {number} numberOfSets - The number of sets in the group.
- * @returns The height of the set group.
- */
+export function getSetGroupHeaderHeight(spacing: ThemeSpacing) {
+  return (
+    // SetGroup.header.height
+    spacing["11"] +
+    // SetGroup.header.marginBottom
+    spacing["4"]
+  );
+}
+
+export function getSetHeight(spacing: ThemeSpacing) {
+  return (
+    // Set.container.height
+    spacing["12"]
+  );
+}
 
 export function getSetGroupContentHeight(
   spacing: ThemeSpacing,
   numberOfSets: number
 ) {
-  "worklet";
   return (
     // SetHeader.setsHeader.height
     spacing["9"] +
     // Set.container.height
-    numberOfSets * spacing["12"] +
+    numberOfSets * getSetHeight(spacing) +
     // SetGroupContent.setGroupContainer.borderWidth
     spacing["0.5"] * 2 +
     // SetGroupContent.addSetButton.height
@@ -26,6 +34,13 @@ export function getSetGroupContentHeight(
     // This is additional height that is used
     // as padding to the bottom of the set group
     spacing["8"]
+  );
+}
+
+export function getSetGroupHeight(spacing: ThemeSpacing, numberOfSets: number) {
+  return (
+    getSetGroupHeaderHeight(spacing) +
+    getSetGroupContentHeight(spacing, numberOfSets)
   );
 }
 
