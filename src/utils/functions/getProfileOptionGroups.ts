@@ -1,4 +1,4 @@
-import { IoniconType } from "./../types/lib/Ionicon";
+import { IoniconType } from "../types/lib/Ionicon";
 
 export type OptionLabel =
   | "Light Mode"
@@ -18,7 +18,7 @@ export type OptionType = {
  * Each OptionGroup is an array of options
  * @returns An array of arrays of options.
  */
-export function getOptionGroups(): OptionType[][] {
+export function getProfileOptionGroups(): OptionType[][] {
   return [
     [
       {

@@ -4,12 +4,12 @@ import { Text, View } from "react-native";
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import OptionGroup from "src/component/Profile/OptionGroup";
-import { getOptionGroups } from "src/utils/functions/getOptionGroups";
+import { getProfileOptionGroups } from "src/utils/functions/getProfileOptionGroups";
 
 export default function ProfileScreen() {
   const styles = useStyles();
   const { mode } = useThemeMode();
-  const optionGroups = getOptionGroups();
+  const optionGroups = getProfileOptionGroups();
 
   return (
     <SafeAreaView style={styles.container}>

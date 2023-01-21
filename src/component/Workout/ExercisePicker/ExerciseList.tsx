@@ -1,4 +1,5 @@
 import { makeStyles } from "@rneui/themed";
+import * as Haptics from "expo-haptics";
 import React from "react";
 import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -26,6 +27,7 @@ const renderItem = ({
   const isStickyHeader = stickyHeaders.includes(index);
   const isItemBeforeHeader = stickyHeaders.includes(index + 1);
   const handleSelect = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // Deselect if already selected
     if (isSelected) {
       setSelectedExercises((exercises) =>

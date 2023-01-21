@@ -8,7 +8,7 @@ import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import { auth } from "src/config/firebase";
 import { useLiftStore } from "src/store";
 import { updateSettings } from "src/store/actions/settingsActions";
-import { OptionType } from "src/utils/functions/getOptionGroups";
+import { OptionType } from "src/utils/functions/getProfileOptionGroups";
 
 const Option = ({ item }: ListRenderItemInfo<OptionType>) => {
   const styles = useStyles();
