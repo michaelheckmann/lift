@@ -2,7 +2,7 @@ import { makeStyles, useTheme } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import {
   FieldArrayWithId,
-  UseFieldArrayMove,
+  UseFieldArrayReturn,
   UseFormReturn,
 } from "react-hook-form";
 import { View } from "react-native";
@@ -28,7 +28,7 @@ import { ListItemLayout } from "./Workout";
 type Props = {
   fields: FieldArrayWithId<WorkoutJoin, "setGroups", "fieldId">[];
   methods: UseFormReturn<WorkoutJoin, any>;
-  move: UseFieldArrayMove;
+  fieldArrayOps: UseFieldArrayReturn<WorkoutJoin, "setGroups", "fieldId">;
   openExercisePicker: () => void;
   submit: () => void;
   listLayout: SharedValue<ListItemLayout[]>;
@@ -37,7 +37,7 @@ type Props = {
 export default function SetGroupList({
   fields,
   methods,
-  move,
+  fieldArrayOps,
   openExercisePicker,
   submit,
   listLayout,
@@ -107,7 +107,7 @@ export default function SetGroupList({
               methods={methods}
               setGroup={setGroup}
               setGroupIndex={index}
-              move={move}
+              fieldArrayOps={fieldArrayOps}
               listLayout={listLayout}
               tightLayoutOrder={tightLayoutOrder}
               reorderIndex={reorderIndex}

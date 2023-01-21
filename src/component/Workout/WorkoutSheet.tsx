@@ -1,4 +1,4 @@
-import { Portal, PortalHost } from "@gorhom/portal";
+import { Portal } from "@gorhom/portal";
 import { makeStyles, useTheme } from "@rneui/themed";
 import React, { useEffect, useState } from "react";
 import { Dimensions, useWindowDimensions } from "react-native";
@@ -170,7 +170,6 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
           </Animated.View>
         </PanGestureHandler>
       </Portal>
-      <PortalHost name="custom_host" />
     </>
   );
 }

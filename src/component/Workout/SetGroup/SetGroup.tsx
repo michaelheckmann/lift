@@ -1,9 +1,15 @@
 import MIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import { makeStyles, useTheme } from "@rneui/themed";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   FieldArrayWithId,
-  UseFieldArrayMove,
+  UseFieldArrayReturn,
   UseFormReturn,
 } from "react-hook-form";
 import {
@@ -13,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
+import Modal from "react-native-modal";
 import Animated, {
   runOnJS,
   SharedValue,
@@ -25,9 +32,15 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { clamp } from "react-native-redash";
+import QuickMenu, { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
+import {
+  deleteSetGroup,
+  updateSetGroup,
+} from "src/store/actions/setgroupActions";
 import { getSetGroupHeaderHeight } from "src/utils/functions/getSetGroupLayouts";
 import { computeLayoutOffset } from "src/utils/functions/listLayoutHelpers";
 import { moveArrayItem } from "src/utils/functions/moveArrayItem";
+import { usePrevious } from "src/utils/hooks/usePrevious";
 import { useShadow } from "src/utils/hooks/useShadow";
 import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 import { ListItemLayout } from "../Workout/Workout";
@@ -37,7 +50,7 @@ type Props = {
   setGroup: FieldArrayWithId<WorkoutJoin, "setGroups", "fieldId">;
   setGroupIndex: number;
   methods: UseFormReturn<WorkoutJoin, any>;
-  move: UseFieldArrayMove;
+  fieldArrayOps: UseFieldArrayReturn<WorkoutJoin, "setGroups", "fieldId">;
   listLayout: SharedValue<ListItemLayout[]>;
   tightLayoutOrder: SharedValue<number[]>;
   reorderIndex: number;
@@ -48,7 +61,7 @@ export default function SetGroup({
   methods,
   setGroup,
   setGroupIndex,
-  move,
+  fieldArrayOps,
   listLayout,
   tightLayoutOrder,
   reorderIndex,
@@ -61,6 +74,8 @@ export default function SetGroup({
   });
   const { theme } = useTheme();
   const headerHeight = getSetGroupHeaderHeight(theme.spacing);
+
+  const { move, remove } = fieldArrayOps;
 
   // This is the top position of the set group in the list
   const top = useSharedValue(listLayout.value[setGroupIndex].relaxed.top);
@@ -80,6 +95,20 @@ export default function SetGroup({
     setReorderIndex(setGroupIndex);
   };
 
+  const previousSetGroupIndex = usePrevious(setGroupIndex);
+
+  useEffect(() => {
+    // If the set group has just been added, do nothing
+    if (previousSetGroupIndex === undefined) return;
+    // If the set group index has not changed, do nothing
+    if (previousSetGroupIndex === setGroupIndex) return;
+    // If the set group index has changed, update the remote state
+    updateSetGroup.dispatch({
+      id: setGroup.id,
+      order: setGroupIndex,
+    });
+  }, [setGroupIndex]);
+
   // This hook is used to alternate between the relaxed and tight layouts
   useAnimatedReaction(
     // The first parameter of the callback function is a function that returns the
@@ -95,7 +124,7 @@ export default function SetGroup({
       // that there is no item being dragged, so we want to animate the position
       // of the set group to its relaxed position.
       if (reorderIndex === -1) {
-        top.value = withSpring(layout.relaxed.top);
+        top.value = withSpring(layout.relaxed.top, { damping: 100 });
         height.value = withDelay(
           100,
           withTiming(layout.relaxed.height, { duration: 100 })
@@ -110,7 +139,7 @@ export default function SetGroup({
     },
     // The third parameter of the callback function is an array of dependencies. In
     // this case, the dependency is the reorderIndex variable.
-    [reorderIndex]
+    [reorderIndex, setGroupIndex]
   );
 
   // This is used to animate the set groups out of the way
@@ -135,6 +164,15 @@ export default function SetGroup({
     },
     [reorderIndex]
   );
+
+  const handleOnGestureEnd = (reorderIndex: number, newIndex: number) => {
+    if (reorderIndex !== newIndex) {
+      // Move the set group in the local form state
+      move(reorderIndex, newIndex);
+    }
+    // Close the reordering state
+    setReorderIndex(-1);
+  };
 
   const gestureHandler = useAnimatedGestureHandler({
     onStart: (_, context: any) => {
@@ -195,8 +233,7 @@ export default function SetGroup({
         },
         tight: data.tight,
       }));
-      runOnJS(move)(reorderIndex, newIndex);
-      runOnJS(setReorderIndex)(-1);
+      runOnJS(handleOnGestureEnd)(reorderIndex, newIndex);
     },
   });
 
@@ -214,18 +251,66 @@ export default function SetGroup({
     };
   }, [reorderIndex]);
 
+  const [setGroupMenuVisible, setSetGroupMenuVisible] = useState(false);
+
+  const ref = useRef<Animated.View>(null);
+  const xPosition = useSharedValue(0);
+  const yPosition = useSharedValue(0);
+
+  const openSetGroupMenu = () => {
+    ref.current.measureInWindow((x, y) => {
+      xPosition.value = x;
+      yPosition.value = y;
+      setSetGroupMenuVisible(true);
+    });
+  };
+  const closeSetGroupMenu = () => setSetGroupMenuVisible(false);
+
+  const handleDeleteSetGroup = () => {
+    closeSetGroupMenu();
+    deleteSetGroup(setGroup);
+    // Recompute the layout of the set groups
+    // without the set group that was just deleted
+    const newList = listLayout.value
+      .slice()
+      .filter((_, index) => index !== setGroupIndex);
+    listLayout.value = newList.map((item, index) => {
+      return {
+        relaxed: {
+          top: computeLayoutOffset(newList, index),
+          height: item.relaxed.height,
+        },
+        tight: item.tight,
+      };
+    });
+    remove(setGroupIndex);
+  };
+
+  const setGroupMenuOptions: QuickMenuOptionType[] = [
+    {
+      label: "Delete",
+      icon: "trash-outline",
+      onPress: handleDeleteSetGroup,
+    },
+  ];
+
   return (
-    <Animated.View style={[styles.container, animatedStyles]}>
+    <Animated.View style={[styles.container, animatedStyles]} ref={ref}>
       {/* Set Group Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={[styles.headerButton, styles.setGroupOptions]}>
+        <TouchableOpacity
+          style={[styles.headerButton, styles.setGroupOptions]}
+          onPress={openSetGroupMenu}
+        >
           <Text style={styles.headerButtonText}>
             {reorderIndex === -1 && setGroupIndex + 1}
             {reorderIndex !== -1 && tightOrderIndex + 1}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.headerButton, styles.exercise]}>
-          <Text style={styles.headerButtonText}>{setGroup.exercise.name}</Text>
+          <Text style={styles.headerButtonText}>
+            {setGroup?.exercise?.name}
+          </Text>
         </TouchableOpacity>
         <PanGestureHandler
           onGestureEvent={gestureHandler}
@@ -254,6 +339,22 @@ export default function SetGroup({
         setGroup={setGroup}
         listLayout={listLayout}
       />
+
+      <Modal
+        isVisible={setGroupMenuVisible}
+        onBackdropPress={closeSetGroupMenu}
+        backdropOpacity={0.4}
+        animationInTiming={10}
+        animationIn="zoomIn"
+        animationOut="fadeOut"
+        animationOutTiming={200}
+      >
+        <QuickMenu
+          yPosition={yPosition}
+          xPosition={xPosition}
+          options={setGroupMenuOptions}
+        />
+      </Modal>
     </Animated.View>
   );
 }

@@ -15,7 +15,7 @@ export function getWorkoutbyId(id: string): WorkoutJoin {
     return workout.id === id;
   });
   const relevantSetGroups = setGroups.filter(
-    (setGroup) => setGroup.workout_id === id
+    (setGroup) => !setGroup.archived && setGroup.workout_id === id
   );
   const relevantSets = sets.filter(
     (set) =>

@@ -54,11 +54,12 @@ export default function Workout({
     defaultValues: useMemo(() => workoutData, [workoutData]),
   });
   const { control, handleSubmit, reset } = methods;
-  const { fields, append, move } = useFieldArray({
+  const fieldArrayOps = useFieldArray({
     control,
     name: "setGroups",
     keyName: "fieldId",
   });
+  const { fields, append } = fieldArrayOps;
 
   const onSubmit = (data) => console.log(JSON.stringify(data, null, 4));
   const submit = () => {
@@ -67,7 +68,8 @@ export default function Workout({
 
   const handleAppendSetGroup = (exercise: ExerciseSlice) => {
     const defaultSetGroup = {
-      order: fields.length + 1,
+      // 0-indexed order in the remote state
+      order: fields.length,
       exercise_id: exercise.id,
       exercise,
       sets: [],
@@ -159,7 +161,7 @@ export default function Workout({
         <SetGroupList
           fields={fields}
           methods={methods}
-          move={move}
+          fieldArrayOps={fieldArrayOps}
           openExercisePicker={openExercisePicker}
           submit={submit}
           listLayout={listLayout}

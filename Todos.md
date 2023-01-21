@@ -9,8 +9,10 @@
 
 [x] => Dark mode
 [X] => Full row success state
-[ ] => Reorder setgroups
+[X] => Reorder setgroups
 [X] => Rename
+[X] => Fix network
+[X] => Delete exercise
 [ ] => Timer
 [ ] => Previous exercise
 [ ] => Rework login

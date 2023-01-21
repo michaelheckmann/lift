@@ -1,9 +1,15 @@
 import update from "immutability-helper";
 import { useLiftStore } from "src/store";
+import { updateSet } from "src/store/actions/setActions";
 import { updateRemoteState } from "src/utils/functions/dbSync";
 import { generateUUID } from "src/utils/functions/generateUUID";
 import { Action } from "src/utils/types/lib/Actions";
-import { SetGroupCreate, SetGroupSlice } from "src/utils/types/SetGroup";
+import {
+  SetGroupCreate,
+  SetGroupSlice,
+  SetGroupUpdate,
+} from "src/utils/types/SetGroup";
+import { WorkoutJoin } from "src/utils/types/WorkoutJoin";
 import { dispatchAction } from "../utils";
 
 type CreateSetGroupDispatchArgs = {
@@ -56,4 +62,72 @@ export const createSetGroup: Action<
       })
     );
   },
+};
+
+export const updateSetGroup: Action<SetGroupUpdate> = {
+  dispatch(args) {
+    dispatchAction<SetGroupUpdate>(updateSetGroup, args);
+  },
+  _commit({ id, ...args }) {
+    return updateRemoteState<SetGroupUpdate>(
+      `setgroups?id=eq.${id}`,
+      "PATCH",
+      args
+    );
+  },
+  _store(args) {
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
+        setGroups: {
+          $apply: (setGroups: SetGroupSlice[]) =>
+            setGroups.map((setGroup) => {
+              if (setGroup.id === args.id) {
+                return {
+                  ...setGroup,
+                  ...args,
+                };
+              }
+              return setGroup;
+            }),
+        },
+      })
+    );
+  },
+  _rollback({ id }, previousState) {
+    const previous = previousState.sets.find((set) => set.id === id);
+    if (!previous) {
+      return;
+    }
+    useLiftStore.setState(
+      update(useLiftStore.getState(), {
+        setGroups: {
+          $apply: (setGroups: SetGroupSlice[]) =>
+            setGroups.map((setGroup) => {
+              if (setGroup.id === id) {
+                return {
+                  ...setGroup,
+                  ...previous,
+                };
+              }
+              return setGroup;
+            }),
+        },
+      })
+    );
+  },
+};
+
+type WorkoutJoinSetGroup = WorkoutJoin["setGroups"][0];
+export const deleteSetGroup = (setGroup: WorkoutJoinSetGroup) => {
+  const { id, sets } = setGroup;
+  for (const set of sets) {
+    updateSet.dispatch({
+      id: set.id,
+      archived: true,
+    });
+  }
+  updateSetGroup.dispatch({
+    id,
+    archived: true,
+  });
 };

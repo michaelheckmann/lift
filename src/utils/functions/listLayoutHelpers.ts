@@ -3,7 +3,8 @@ import { ListItemLayout } from "../../component/Workout/Workout/Workout";
 
 export function computeLayoutOffset(
   listLayout: ListItemLayout[],
-  itemIndex: number = undefined
+  itemIndex: number = undefined,
+  skipIndex: number = undefined
 ) {
   "worklet";
   if (listLayout.length === 0) {
@@ -20,7 +21,14 @@ export function computeLayoutOffset(
 
   let offset = 0;
   for (let i = 0; i < itemIndex; i++) {
-    offset += listLayout[i].relaxed.height;
+    // This is necessary when an item is
+    // being removed from the list and there not
+    // taking into account when computing the offset
+    if (skipIndex !== undefined && i === skipIndex) {
+      continue;
+    } else {
+      offset += listLayout[i].relaxed.height;
+    }
   }
   return offset;
 }

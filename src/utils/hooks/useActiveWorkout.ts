@@ -6,6 +6,8 @@ import { useLiftStore } from "src/store";
  */
 export function useActiveWorkout(): string | undefined {
   const workouts = useLiftStore((state) => state.workouts);
-  const openWorkout = workouts.find((workout) => !workout.done);
+  const openWorkout = workouts.find(
+    (workout) => !workout.done && !workout.archived
+  );
   return openWorkout?.id;
 }
