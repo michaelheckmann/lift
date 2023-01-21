@@ -1,4 +1,5 @@
 import { makeStyles, useTheme } from "@rneui/themed";
+import * as Haptics from "expo-haptics";
 import React, { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { View } from "react-native";
@@ -132,6 +133,7 @@ export default function Workout({
   }, [workoutData]);
 
   const openExercisePicker = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setExercisePickerVisible(true);
   };
 
@@ -145,6 +147,7 @@ export default function Workout({
     //   done: true,
     // });
     // onClose();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     console.log(methods.getValues().setGroups.map((s) => s.exercise.name));
   };
 

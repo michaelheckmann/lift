@@ -1,5 +1,6 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import { Input, makeStyles, useTheme } from "@rneui/themed";
+import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useState } from "react";
 import { Controller, FieldArrayWithId, UseFormReturn } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -52,6 +53,10 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
       reps,
       done,
     });
+
+    if (done) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
   }, [weight, reps, done]);
 
   return (

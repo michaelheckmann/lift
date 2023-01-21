@@ -1,5 +1,6 @@
 import MIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import { makeStyles, useTheme } from "@rneui/themed";
+import * as Haptics from "expo-haptics";
 import React, {
   Dispatch,
   SetStateAction,
@@ -92,6 +93,7 @@ export default function SetGroup({
   );
 
   const initReordering = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setReorderIndex(setGroupIndex);
   };
 
@@ -138,7 +140,9 @@ export default function SetGroup({
       }
     },
     // The third parameter of the callback function is an array of dependencies. In
-    // this case, the dependency is the reorderIndex variable.
+    // this case, the dependency is the reorderIndex and setGroupIndex variable.
+    // The setGroupIndex variable is necessary to trigger a re-evaluation
+    // of the callback function when a setGroup is removed.
     [reorderIndex, setGroupIndex]
   );
 
@@ -161,6 +165,7 @@ export default function SetGroup({
       const newIndex = o.findIndex((x) => x === setGroupIndex);
       // Animate the current top value to the top value of the new index in the tight layout
       top.value = withTiming(listLayout.value[newIndex].tight.top);
+      runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
     },
     [reorderIndex]
   );
@@ -258,6 +263,7 @@ export default function SetGroup({
   const yPosition = useSharedValue(0);
 
   const openSetGroupMenu = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     ref.current.measureInWindow((x, y) => {
       xPosition.value = x;
       yPosition.value = y;
@@ -267,6 +273,7 @@ export default function SetGroup({
   const closeSetGroupMenu = () => setSetGroupMenuVisible(false);
 
   const handleDeleteSetGroup = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     closeSetGroupMenu();
     deleteSetGroup(setGroup);
     // Recompute the layout of the set groups

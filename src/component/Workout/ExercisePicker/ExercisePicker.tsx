@@ -1,5 +1,6 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import { Input, makeStyles, useTheme } from "@rneui/themed";
+import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import { Dimensions, View } from "react-native";
 import { useLiftStore } from "src/store";
@@ -75,6 +76,7 @@ export default function ExercisePicker({ closeDialog, onExerciseSelected }) {
   };
 
   const onPrimaryButtonPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (selectedExercises.length > 0) {
       submitExercise();
     } else if (exerciseMode === "add") {
@@ -86,6 +88,7 @@ export default function ExercisePicker({ closeDialog, onExerciseSelected }) {
   };
 
   const onSecondaryButtonPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (selectedExercises.length > 0) {
       clearSelectedExercises();
     } else if (exerciseMode === "add") {

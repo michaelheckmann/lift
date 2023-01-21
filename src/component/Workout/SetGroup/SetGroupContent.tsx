@@ -1,6 +1,7 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import MIcon from "@expo/vector-icons/MaterialIcons";
 import { Button, makeStyles, useTheme } from "@rneui/themed";
+import * as Haptics from "expo-haptics";
 import React from "react";
 import {
   FieldArrayWithId,
@@ -53,6 +54,7 @@ export default function SetGroupContent({
   });
 
   const handleAppendSet = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const defaultSet = {
       weight: 0,
       reps: 0,
@@ -89,6 +91,7 @@ export default function SetGroupContent({
   };
 
   const handleRemoveSet = (setIndex) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     remove(setIndex);
 
     listLayout.value = listLayout.value.map((listLayout, index) => {
