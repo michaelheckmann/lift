@@ -7,53 +7,57 @@ import QuickMenu, { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
 type Props = {
   xPosition: SharedValue<number>;
   yPosition: SharedValue<number>;
-  setGroupMenuOptions: QuickMenuOptionType[];
-  setGroupMenuVisible: boolean;
-  setSetGroupMenuVisible: Dispatch<SetStateAction<boolean>>;
+  menuOptions: QuickMenuOptionType[];
+  menuVisible: boolean;
+  setMenuVisible: Dispatch<SetStateAction<boolean>>;
+  openToLeft?: boolean;
 };
 
 export default function QuickMenuModal({
   xPosition,
   yPosition,
-  setGroupMenuOptions,
-  setGroupMenuVisible,
-  setSetGroupMenuVisible,
+  menuOptions,
+  menuVisible,
+  setMenuVisible,
+  openToLeft,
 }: Props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
-    if (setGroupMenuVisible) {
-      setModalVisible(setGroupMenuVisible);
-      setShowMenu(setGroupMenuVisible);
+    if (menuVisible) {
+      setModalVisible(true);
+      setShowMenu(true);
     } else {
       setShowMenu(false);
       setTimeout(() => {
         setModalVisible(false);
       }, 200);
     }
-  }, [setGroupMenuVisible]);
+  }, [menuVisible]);
 
   const handleBackdropPress = () => {
-    setSetGroupMenuVisible(false);
+    setMenuVisible(false);
   };
 
   return (
     <Modal
       isVisible={modalVisible}
       onBackdropPress={handleBackdropPress}
-      backdropOpacity={0.4}
+      backdropOpacity={0.2}
       animationInTiming={150}
-      animationIn="zoomIn"
+      animationIn="fadeIn"
       animationOut="fadeOut"
       animationOutTiming={150}
+      backdropTransitionOutTiming={150}
       style={styles.modal}
     >
       <QuickMenu
         yPosition={yPosition}
         xPosition={xPosition}
-        options={setGroupMenuOptions}
+        options={menuOptions}
         showMenu={showMenu}
+        openToLeft={openToLeft}
       />
     </Modal>
   );

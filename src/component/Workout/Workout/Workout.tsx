@@ -190,7 +190,7 @@ export default function Workout({
   );
 }
 
-const useStyles = makeStyles((theme) => {
+const useStyles = makeStyles(() => {
   return {
     container: {
       flex: 1,

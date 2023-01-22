@@ -1,9 +1,12 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import { Input, makeStyles, useTheme } from "@rneui/themed";
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, FieldArrayWithId, UseFormReturn } from "react-hook-form";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
+import { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
+import QuickMenuModal from "src/component/Shared/QuickMenuModal";
 import { updateSet } from "src/store/actions/setActions";
 import { debounce } from "src/utils/functions/debounce";
 import { getSetSpacing } from "src/utils/functions/getSetSpacing";
@@ -33,6 +36,21 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
 
   const width = getSetSpacing();
 
+  const xPosition = useSharedValue(0);
+  const yPosition = useSharedValue(0);
+  const menuButtonRef = useRef(null);
+
+  const [quickMenuVisible, setQuickMenuVisible] = useState(false);
+  const openQuickMenu = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    menuButtonRef.current.measureInWindow((x, y) => {
+      xPosition.value = x;
+      yPosition.value = y;
+      setQuickMenuVisible(true);
+    });
+  };
+  const closeQuickMenu = () => setQuickMenuVisible(false);
+
   const saveData = useCallback<{ (args: SetUpdate) }>(
     debounce((data: SetUpdate) => updateSet.dispatch(data), 1000),
     []
@@ -59,20 +77,42 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
     }
   }, [weight, reps, done]);
 
+  const quickMenuOptions: QuickMenuOptionType[] = [
+    {
+      label: "Add a note",
+      icon: "document-text-outline",
+      onPress: () => {
+        console.log("Add a note");
+        closeQuickMenu();
+      },
+    },
+    {
+      label: "Delete",
+      icon: "trash-outline",
+      onPress: () => {
+        console.log("Delete");
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        closeQuickMenu();
+      },
+    },
+  ];
+
   return (
     <View key={set.id} style={styles.container}>
       {/* Set Number */}
-      <View
+      <TouchableOpacity
         style={[
           styles.containerItem,
           styles.firstContainerItem,
           { width: width.set },
         ]}
+        onPress={openQuickMenu}
+        ref={menuButtonRef}
       >
         <View style={styles.setNumber}>
           <Text style={styles.setNumberText}>{setIndex + 1}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
 
       {/* Previous */}
       <View style={[styles.containerItem, { width: width.previous }]}>
@@ -144,6 +184,14 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
             </View>
           </TouchableOpacity>
         )}
+      />
+
+      <QuickMenuModal
+        menuVisible={quickMenuVisible}
+        setMenuVisible={setQuickMenuVisible}
+        xPosition={xPosition}
+        yPosition={yPosition}
+        menuOptions={quickMenuOptions}
       />
     </View>
   );

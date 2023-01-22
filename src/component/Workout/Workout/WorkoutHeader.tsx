@@ -1,8 +1,11 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import { makeStyles, useTheme } from "@rneui/themed";
-import React from "react";
+import * as Haptics from "expo-haptics";
+import React, { useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { useSharedValue } from "react-native-reanimated";
+import { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
+import QuickMenuModal from "src/component/Shared/QuickMenuModal";
 
 export default function WorkoutHeader({
   isCollapsed,
@@ -11,6 +14,55 @@ export default function WorkoutHeader({
 }) {
   const styles = useStyles({ isCollapsed });
   const { theme } = useTheme();
+
+  const xPosition = useSharedValue(0);
+  const yPosition = useSharedValue(0);
+
+  const timerButtonRef = useRef(null);
+  const workoutButtonRef = useRef(null);
+
+  const [timerMenuVisible, setTimerMenuVisible] = useState(false);
+  const [workoutMenuVisible, setWorkoutMenuVisible] = useState(false);
+
+  const openTimerMenu = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    timerButtonRef.current.measureInWindow((x, y) => {
+      xPosition.value = x;
+      yPosition.value = y;
+      setTimerMenuVisible(true);
+    });
+  };
+  const closeTimerMenu = () => setTimerMenuVisible(false);
+  const timerMenuOptions: QuickMenuOptionType[] = [
+    {
+      label: "Add a note",
+      icon: "document-text-outline",
+      onPress: () => {
+        console.log("Add a note");
+        closeTimerMenu();
+      },
+    },
+  ];
+
+  const openWorkoutMenu = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    workoutButtonRef.current.measureInWindow((x, y) => {
+      xPosition.value = x;
+      yPosition.value = y;
+      setWorkoutMenuVisible(true);
+    });
+  };
+  const closeWorkoutMenu = () => setWorkoutMenuVisible(false);
+  const workoutMenuOptions: QuickMenuOptionType[] = [
+    {
+      label: "Add a note",
+      icon: "document-text-outline",
+      onPress: () => {
+        console.log("Add a note");
+        closeWorkoutMenu();
+      },
+    },
+  ];
 
   return (
     <Animated.View style={styles.headerContainer}>
@@ -28,18 +80,31 @@ export default function WorkoutHeader({
         )}
 
         {/* Header Bar */}
+        {/* Timer Menu */}
         <View style={styles.headerBar}>
-          <TouchableOpacity style={styles.iconContainer}>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={openTimerMenu}
+            ref={timerButtonRef}
+          >
             <Icon
               name="timer-outline"
               size={theme.spacing["6"]}
               color={theme.colors.text}
             />
           </TouchableOpacity>
+
+          {/* Countdown */}
           <TouchableOpacity style={styles.timeContainer}>
             <Text style={styles.time}>00:00</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconContainer}>
+
+          {/* Workout Menu */}
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={openWorkoutMenu}
+            ref={workoutButtonRef}
+          >
             <Icon
               name="list-outline"
               size={theme.spacing["6"]}
@@ -48,6 +113,25 @@ export default function WorkoutHeader({
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
+
+      {/* Timer Menu */}
+      <QuickMenuModal
+        xPosition={xPosition}
+        yPosition={yPosition}
+        menuVisible={timerMenuVisible}
+        setMenuVisible={setTimerMenuVisible}
+        menuOptions={timerMenuOptions}
+      />
+
+      {/* Workout Menu */}
+      <QuickMenuModal
+        xPosition={xPosition}
+        yPosition={yPosition}
+        menuVisible={workoutMenuVisible}
+        setMenuVisible={setWorkoutMenuVisible}
+        menuOptions={workoutMenuOptions}
+        openToLeft={true}
+      />
     </Animated.View>
   );
 }
