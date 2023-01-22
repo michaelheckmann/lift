@@ -27,15 +27,7 @@ type ConfigMap = {
 const getConfigMap = (theme: ThemeType): ConfigMap => {
   const { colors } = theme;
   return {
-    Workout: {
-      heading: {
-        color: {
-          light: colors.primary,
-          dark: colors.primary,
-          halloween: colors.primary,
-        },
-      },
-    },
+    Workout: {},
     SetGroup: {
       addSetButton: {
         backgroundColor: {

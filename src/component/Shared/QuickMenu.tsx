@@ -15,38 +15,51 @@ export type QuickMenuOptionType = {
   label: string;
   icon: IoniconType;
   onPress: () => void;
+  isSecondary?: boolean;
 };
 
 type Props = {
   yPosition: SharedValue<number>;
   xPosition: SharedValue<number>;
   options: QuickMenuOptionType[];
+  showMenu: boolean;
 };
 
-export default function QuickMenu({ yPosition, xPosition, options }: Props) {
+export default function QuickMenu({
+  yPosition,
+  xPosition,
+  options,
+  showMenu,
+}: Props) {
   const shadow = useShadow(3);
   const { theme } = useTheme();
-  const itemHeight = theme.spacing[12];
+  const itemHeight = theme.spacing["14"];
   const containerHeight = itemHeight * options.length + theme.spacing["2"] * 2;
   const styles = useStyles({ shadow, itemHeight });
 
   const width = useSharedValue(0);
   const height = useSharedValue(0);
 
+  const config = {
+    duration: 150,
+  };
+
   useEffect(() => {
-    width.value = theme.spacing["48"];
-    height.value = containerHeight;
-  }, []);
+    if (showMenu) {
+      width.value = withTiming(theme.spacing["56"], config);
+      height.value = withTiming(containerHeight, config);
+    } else {
+      width.value = withTiming(0, config);
+      height.value = withTiming(0, config);
+    }
+  }, [showMenu]);
 
   const animatedStyles = useAnimatedStyle(() => {
-    const config = {
-      duration: 200,
-    };
     return {
       top: yPosition.value,
       left: xPosition.value,
-      width: withTiming(width.value, config),
-      height: withTiming(height.value, config),
+      width: width.value,
+      height: height.value,
     };
   });
   return (
@@ -78,7 +91,7 @@ const useStyles = makeStyles((theme, props) => {
     container: {
       position: "absolute",
       backgroundColor: colors.background,
-      padding: spacing["2"],
+      paddingHorizontal: spacing["3"],
       borderRadius: borderRadius.sm,
       justifyContent: "center",
       overflow: "hidden",

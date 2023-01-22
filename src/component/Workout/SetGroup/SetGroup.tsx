@@ -20,7 +20,6 @@ import {
   View,
 } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
-import Modal from "react-native-modal";
 import Animated, {
   runOnJS,
   SharedValue,
@@ -33,7 +32,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { clamp } from "react-native-redash";
-import QuickMenu, { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
+import { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
+import QuickMenuModal from "src/component/Shared/QuickMenuModal";
 import {
   deleteSetGroup,
   updateSetGroup,
@@ -267,6 +267,7 @@ export default function SetGroup({
     ref.current.measureInWindow((x, y) => {
       xPosition.value = x;
       yPosition.value = y;
+
       setSetGroupMenuVisible(true);
     });
   };
@@ -295,9 +296,26 @@ export default function SetGroup({
 
   const setGroupMenuOptions: QuickMenuOptionType[] = [
     {
+      label: "Add a note",
+      icon: "document-text-outline",
+      onPress: () => {
+        console.log("Add a note");
+        closeSetGroupMenu();
+      },
+    },
+    {
+      label: "Replace exercise",
+      icon: "refresh-outline",
+      onPress: () => {
+        console.log("Replace exercise");
+        closeSetGroupMenu();
+      },
+    },
+    {
       label: "Delete",
       icon: "trash-outline",
       onPress: handleDeleteSetGroup,
+      isSecondary: true,
     },
   ];
 
@@ -347,21 +365,13 @@ export default function SetGroup({
         listLayout={listLayout}
       />
 
-      <Modal
-        isVisible={setGroupMenuVisible}
-        onBackdropPress={closeSetGroupMenu}
-        backdropOpacity={0.4}
-        animationInTiming={10}
-        animationIn="zoomIn"
-        animationOut="fadeOut"
-        animationOutTiming={200}
-      >
-        <QuickMenu
-          yPosition={yPosition}
-          xPosition={xPosition}
-          options={setGroupMenuOptions}
-        />
-      </Modal>
+      <QuickMenuModal
+        setGroupMenuVisible={setGroupMenuVisible}
+        xPosition={xPosition}
+        yPosition={yPosition}
+        setGroupMenuOptions={setGroupMenuOptions}
+        setSetGroupMenuVisible={setSetGroupMenuVisible}
+      />
     </Animated.View>
   );
 }
