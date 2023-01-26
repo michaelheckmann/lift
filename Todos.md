@@ -14,8 +14,14 @@
 [X] => Fix network
 [X] => Delete exercise
 [X] => Haptics
+[ ] => Exercise Model {
+[ ] => Previous Exercise
+[ ] => Equipment for Exercise
+[ ] => Main body part
+[ ] => Timer
+[ ] => Notes
+}
 [ ] => Timer animation
-[ ] => Previous exercise
 [ ] => Rework login
 [ ] => Replace exercise
 
@@ -27,4 +33,4 @@
 [ ] => Delete set polish
 [ ] => Past workout overview
 [ ] => Browse past workouts in exercise picker
-[ ] =>
+[ ] => Configure rollback and full sync

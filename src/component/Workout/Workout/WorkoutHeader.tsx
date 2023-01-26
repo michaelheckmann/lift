@@ -15,24 +15,19 @@ import QuickMenuModal from "src/component/Shared/QuickMenuModal";
 import { useLiftStore, useTempStore } from "src/store";
 import { formatCountdown } from "src/utils/functions/formatCountdown";
 import useCountdown from "src/utils/hooks/useCountdown";
-import { FinishedSet } from "./Workout";
 
 const DEFAULT_COUNTDOWN = 90; // seconds
 
 type Props = {
   isCollapsed: boolean;
-  handleFinish: () => void;
+  handleFinish: (save?: boolean) => void;
   setExpanded: Dispatch<SetStateAction<boolean>>;
-  countdownTrigger: FinishedSet;
-  setCountdownTrigger: Dispatch<SetStateAction<FinishedSet>>;
 };
 
 export default function WorkoutHeader({
   isCollapsed,
   handleFinish,
   setExpanded,
-  countdownTrigger,
-  setCountdownTrigger,
 }: Props) {
   const styles = useStyles({ isCollapsed });
   const { theme } = useTheme();
@@ -58,9 +53,6 @@ export default function WorkoutHeader({
   });
 
   const { global } = useLiftStore().operations;
-  const showConfig = () => {
-    console.log(global);
-  };
 
   useEffect(() => {
     if (count === 0) {
@@ -70,7 +62,6 @@ export default function WorkoutHeader({
   }, [count]);
 
   useEffect(() => {
-    console.log("lastFinishedSet", lastFinishedSet);
     if (lastFinishedSet) {
       resetCountdown();
       startCountdown();
@@ -147,6 +138,17 @@ export default function WorkoutHeader({
         closeWorkoutMenu();
       },
     },
+    {
+      label: "Delete workout",
+      icon: "trash-outline",
+      onPress: () => {
+        // TODO: Handle cascade delete
+        // This is a bit tricky because we need to delete the workout,
+        // the setGroups, and sets
+        handleFinish(false);
+        closeWorkoutMenu();
+      },
+    },
   ];
 
   return (
@@ -183,8 +185,7 @@ export default function WorkoutHeader({
           {/* Countdown */}
           <TouchableOpacity
             style={styles.timeContainer}
-            // onPress={startCountdown}
-            onPress={showConfig}
+            onPress={startCountdown}
             disabled={isCollapsed}
           >
             <Text style={styles.time}>{formatCountdown(count)}</Text>

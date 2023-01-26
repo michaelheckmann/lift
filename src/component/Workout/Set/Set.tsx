@@ -103,7 +103,6 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
     value: boolean,
     onChange: (any) => void
   ) => {
-    console.log("HANDLE DONE TOGGLE");
     !value && setLastFinishedSet(id);
     onChange(!value);
   };

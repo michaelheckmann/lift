@@ -1,17 +1,12 @@
 import { makeStyles, useTheme } from "@rneui/themed";
 import * as Haptics from "expo-haptics";
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { View } from "react-native";
 import Modal from "react-native-modal";
 import { useSharedValue } from "react-native-reanimated";
 import { createSetGroup } from "src/store/actions/setgroupActions";
+import { updateWorkout } from "src/store/actions/workoutsActions";
 import {
   getSetGroupHeaderHeight,
   getSetGroupHeight,
@@ -34,17 +29,23 @@ export type ListItemLayout = {
   };
 };
 
-export type FinishedSet = {
-  id: string;
-  exercise: ExerciseSlice;
-};
-
 type Props = {
   onClose: () => void;
   workoutData: Partial<WorkoutJoin>;
   isCollapsed: boolean;
   setExpanded: Dispatch<SetStateAction<boolean>>;
 };
+
+function prepareWorkoutData(workout: Partial<WorkoutJoin>): WorkoutJoin {
+  const defaultWorkout: WorkoutJoin = {
+    id: "0",
+    archived: false,
+    done: false,
+    setGroups: [],
+    created_at: new Date(),
+  };
+  return { ...defaultWorkout, ...workout };
+}
 
 export default function Workout({
   onClose,
@@ -63,8 +64,9 @@ export default function Workout({
 
   /* Definition of the form values and methods */
   const methods = useForm<WorkoutJoin>({
-    defaultValues: useMemo(() => workoutData, [workoutData]),
+    defaultValues: workoutData,
   });
+
   const { control, handleSubmit, reset } = methods;
   const fieldArrayOps = useFieldArray({
     control,
@@ -72,56 +74,6 @@ export default function Workout({
     keyName: "fieldId",
   });
   const { fields, append } = fieldArrayOps;
-
-  // This is used to trigger the countdown
-  const setGroups = useWatch({
-    control,
-    name: "setGroups",
-  });
-  const [finishedSets, setFinishedSets] = useState<FinishedSet[]>([]);
-  const [countdownTrigger, setCountdownTrigger] = useState<FinishedSet | null>(
-    null
-  );
-
-  useEffect(() => {
-    // This code checks if a set has been marked as completed
-    // and adds it to the finished set if it hasn't been added yet.
-    // If a set has been marked as incomplete and was already added
-    // to the finished set, it is removed from the finished set.
-    let newFinishedSet: FinishedSet | null = null;
-    let removedSet: FinishedSet | null = null;
-    if (setGroups && setGroups.length > 0) {
-      setGroups.forEach((setGroup) => {
-        if (setGroup.sets.length > 0) {
-          setGroup.sets.forEach((set) => {
-            if (set.done && !finishedSets.some((s) => s.id === set.id)) {
-              newFinishedSet = {
-                id: set.id,
-                exercise: setGroup.exercise,
-              };
-            } else if (!set.done && finishedSets.some((s) => s.id === set.id)) {
-              removedSet = {
-                id: set.id,
-                exercise: setGroup.exercise,
-              };
-            }
-          });
-        }
-      });
-    }
-    if (newFinishedSet) {
-      setFinishedSets([...finishedSets, newFinishedSet]);
-      setCountdownTrigger(newFinishedSet);
-    }
-    if (removedSet) {
-      setFinishedSets(finishedSets.filter((s) => s.id !== removedSet.id));
-    }
-  }, [setGroups]);
-
-  const onSubmit = (data) => console.log(JSON.stringify(data, null, 4));
-  const submit = () => {
-    handleSubmit(onSubmit)();
-  };
 
   const handleAppendSetGroup = (exercise: ExerciseSlice) => {
     const defaultSetGroup = {
@@ -159,11 +111,12 @@ export default function Workout({
   };
 
   useEffect(() => {
-    reset(workoutData);
+    const data = prepareWorkoutData(workoutData);
+    reset(data);
 
     // Initialize the list layout
-    if (workoutData?.setGroups?.length > 0) {
-      const computedHeights: ListItemLayout[] = workoutData.setGroups.map(
+    if (data?.setGroups?.length > 0) {
+      const computedHeights: ListItemLayout[] = data.setGroups.map(
         ({ sets }) => ({
           relaxed: {
             top: 0,
@@ -185,6 +138,8 @@ export default function Workout({
           height: getSetGroupHeaderHeight(theme.spacing),
         },
       }));
+    } else {
+      listLayout.value = [];
     }
   }, [workoutData]);
 
@@ -197,14 +152,23 @@ export default function Workout({
     setExercisePickerVisible(false);
   };
 
-  const handleFinish = () => {
-    // updateWorkout.dispatch({
-    //   id: workoutData.id,
-    //   done: true,
-    // });
-    // onClose();
+  const handleFinish = (save = true) => {
+    updateWorkout.dispatch({
+      id: workoutData.id,
+      done: true,
+      archived: !save,
+    });
+    onClose();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    console.log(methods.getValues().setGroups.map((s) => s.exercise.name));
+  };
+
+  const onSubmit = (data) => {
+    // TODO : Validate that all sets are filled
+    // Maybe do some cleanup on the data
+    handleFinish(true);
+  };
+  const submit = () => {
+    handleSubmit(onSubmit)();
   };
 
   return (
@@ -214,10 +178,7 @@ export default function Workout({
         isCollapsed={isCollapsed}
         handleFinish={handleFinish}
         setExpanded={setExpanded}
-        countdownTrigger={countdownTrigger}
-        setCountdownTrigger={setCountdownTrigger}
       />
-
       {!isCollapsed && (
         <SetGroupList
           fields={fields}
