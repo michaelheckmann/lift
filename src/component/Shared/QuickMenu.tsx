@@ -38,7 +38,7 @@ export default function QuickMenu({
 }: Props) {
   const shadow = useShadow(3);
   const { theme } = useTheme();
-  const itemHeight = theme.spacing["12"];
+  const itemHeight = theme.spacing["10"];
   const containerHeight = itemHeight * options.length + theme.spacing["2"] * 2;
   const styles = useStyles({ shadow, itemHeight });
 
@@ -118,9 +118,10 @@ const useStyles = makeStyles((theme, props) => {
       position: "absolute",
       backgroundColor: colors.background,
       paddingHorizontal: spacing["2"],
-      borderRadius: borderRadius.sm,
+      borderRadius: borderRadius.md,
       justifyContent: "center",
       paddingTop: spacing["2"],
+      margin: spacing["2"],
       ...shadow,
     },
     overflowContainer: {
@@ -142,7 +143,7 @@ const useStyles = makeStyles((theme, props) => {
     },
     separator: {
       height: spacing["0.5"],
-      backgroundColor: theme.colors.gray200,
+      backgroundColor: theme.colors.gray100,
       width: "100%",
     },
   };

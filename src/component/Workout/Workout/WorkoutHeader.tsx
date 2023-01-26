@@ -1,17 +1,36 @@
 import Icon from "@expo/vector-icons/Ionicons";
 import { makeStyles, useTheme } from "@rneui/themed";
 import * as Haptics from "expo-haptics";
-import React, { useRef, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
 import QuickMenuModal from "src/component/Shared/QuickMenuModal";
+import { formatCountdown } from "src/utils/functions/formatCountdown";
+import useCountdown from "src/utils/hooks/useCountdown";
+import { FinishedSet } from "./Workout";
+
+type Props = {
+  isCollapsed: boolean;
+  handleFinish: () => void;
+  setExpanded: Dispatch<SetStateAction<boolean>>;
+  countdownTrigger: FinishedSet;
+  setCountdownTrigger: Dispatch<SetStateAction<FinishedSet>>;
+};
 
 export default function WorkoutHeader({
   isCollapsed,
   handleFinish,
   setExpanded,
-}) {
+  countdownTrigger,
+  setCountdownTrigger,
+}: Props) {
   const styles = useStyles({ isCollapsed });
   const { theme } = useTheme();
 
@@ -24,6 +43,36 @@ export default function WorkoutHeader({
   const [timerMenuVisible, setTimerMenuVisible] = useState(false);
   const [workoutMenuVisible, setWorkoutMenuVisible] = useState(false);
 
+  const [intervalValue, setIntervalValue] = useState(1000);
+  const [countStart, setCountStart] = useState(5);
+  const [
+    count,
+    {
+      startCountdown,
+      resetCountdown,
+      incrementCountdown,
+      decrementCountdown,
+    },
+  ] = useCountdown({
+    countStart,
+    intervalMs: intervalValue,
+  });
+
+  useEffect(() => {
+    if (count === 0) {
+      console.log("Countdown finished");
+      resetCountdown();
+    }
+  }, [count]);
+
+  useEffect(() => {
+    if (countdownTrigger) {
+      resetCountdown();
+      startCountdown();
+      setCountdownTrigger(null);
+    }
+  }, [countdownTrigger]);
+
   const openTimerMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     timerButtonRef.current.measureInWindow((x, y) => {
@@ -35,10 +84,34 @@ export default function WorkoutHeader({
   const closeTimerMenu = () => setTimerMenuVisible(false);
   const timerMenuOptions: QuickMenuOptionType[] = [
     {
-      label: "Add a note",
-      icon: "document-text-outline",
+      label: "- 30 seconds",
+      icon: "remove-circle-outline",
       onPress: () => {
-        console.log("Add a note");
+        decrementCountdown(30);
+        closeTimerMenu();
+      },
+    },
+    {
+      label: "- 15 seconds",
+      icon: "remove-circle-outline",
+      onPress: () => {
+        decrementCountdown(15);
+        closeTimerMenu();
+      },
+    },
+    {
+      label: "+ 15 seconds",
+      icon: "add-circle-outline",
+      onPress: () => {
+        incrementCountdown(15);
+        closeTimerMenu();
+      },
+    },
+    {
+      label: "+ 30 seconds",
+      icon: "add-circle-outline",
+      onPress: () => {
+        incrementCountdown(30);
         closeTimerMenu();
       },
     },
@@ -69,7 +142,7 @@ export default function WorkoutHeader({
       <TouchableOpacity
         activeOpacity={isCollapsed ? 0.2 : 1}
         disabled={!isCollapsed}
-        onPress={setExpanded}
+        onPress={() => setExpanded((prev) => !prev)}
         style={{ height: "100%" }}
       >
         {/* Drag Affordance */}
@@ -95,8 +168,11 @@ export default function WorkoutHeader({
           </TouchableOpacity>
 
           {/* Countdown */}
-          <TouchableOpacity style={styles.timeContainer}>
-            <Text style={styles.time}>00:00</Text>
+          <TouchableOpacity
+            style={styles.timeContainer}
+            onPress={startCountdown}
+          >
+            <Text style={styles.time}>{formatCountdown(count)}</Text>
           </TouchableOpacity>
 
           {/* Workout Menu */}

@@ -1,7 +1,13 @@
 import { makeStyles, useTheme } from "@rneui/themed";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useMemo, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { View } from "react-native";
 import Modal from "react-native-modal";
 import { useSharedValue } from "react-native-reanimated";
@@ -28,11 +34,16 @@ export type ListItemLayout = {
   };
 };
 
+export type FinishedSet = {
+  id: string;
+  exercise: ExerciseSlice;
+};
+
 type Props = {
   onClose: () => void;
   workoutData: Partial<WorkoutJoin>;
   isCollapsed: boolean;
-  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+  setExpanded: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function Workout({
@@ -61,6 +72,46 @@ export default function Workout({
     keyName: "fieldId",
   });
   const { fields, append } = fieldArrayOps;
+  const setGroups = useWatch({
+    control,
+    name: "setGroups",
+  });
+  const [finishedSets, setFinishedSets] = useState<FinishedSet[]>([]);
+  const [countdownTrigger, setCountdownTrigger] = useState<FinishedSet | null>(
+    null
+  );
+
+  useEffect(() => {
+    let newFinishedSet: FinishedSet | null = null;
+    let removedSet: FinishedSet | null = null;
+    if (setGroups && setGroups.length > 0) {
+      setGroups.forEach((setGroup) => {
+        if (setGroup.sets.length > 0) {
+          setGroup.sets.forEach((set) => {
+            if (set.done && !finishedSets.some((s) => s.id === set.id)) {
+              newFinishedSet = {
+                id: set.id,
+                exercise: setGroup.exercise,
+              };
+            } else if (!set.done && finishedSets.some((s) => s.id === set.id)) {
+              removedSet = {
+                id: set.id,
+                exercise: setGroup.exercise,
+              };
+            }
+          });
+        }
+      });
+    }
+    console.log("newFinishedSet", newFinishedSet?.id, finishedSets.length);
+    if (newFinishedSet) {
+      setFinishedSets([...finishedSets, newFinishedSet]);
+      setCountdownTrigger(newFinishedSet);
+    }
+    if (removedSet) {
+      setFinishedSets(finishedSets.filter((s) => s.id !== removedSet.id));
+    }
+  }, [setGroups]);
 
   const onSubmit = (data) => console.log(JSON.stringify(data, null, 4));
   const submit = () => {
@@ -158,6 +209,8 @@ export default function Workout({
         isCollapsed={isCollapsed}
         handleFinish={handleFinish}
         setExpanded={setExpanded}
+        countdownTrigger={countdownTrigger}
+        setCountdownTrigger={setCountdownTrigger}
       />
 
       {!isCollapsed && (
