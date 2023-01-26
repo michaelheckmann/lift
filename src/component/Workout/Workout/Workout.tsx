@@ -4,7 +4,11 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { View } from "react-native";
 import Modal from "react-native-modal";
-import { useSharedValue } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { createSetGroup } from "src/store/actions/setgroupActions";
 import { updateWorkout } from "src/store/actions/workoutsActions";
 import {
@@ -34,6 +38,7 @@ type Props = {
   workoutData: Partial<WorkoutJoin>;
   isCollapsed: boolean;
   setExpanded: Dispatch<SetStateAction<boolean>>;
+  moveStarted: boolean;
 };
 
 function prepareWorkoutData(workout: Partial<WorkoutJoin>): WorkoutJoin {
@@ -52,6 +57,7 @@ export default function Workout({
   workoutData,
   isCollapsed,
   setExpanded,
+  moveStarted,
 }: Props) {
   const styles = useStyles();
   const { theme } = useTheme();
@@ -171,6 +177,12 @@ export default function Workout({
     handleSubmit(onSubmit)();
   };
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(moveStarted ? 0 : isCollapsed ? 0 : 1, {
+      duration: 300,
+    }),
+  }));
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -179,7 +191,7 @@ export default function Workout({
         handleFinish={handleFinish}
         setExpanded={setExpanded}
       />
-      {!isCollapsed && (
+      <Animated.View style={[styles.setGroupList, animatedStyle]}>
         <SetGroupList
           fields={fields}
           methods={methods}
@@ -188,8 +200,7 @@ export default function Workout({
           submit={submit}
           listLayout={listLayout}
         />
-      )}
-
+      </Animated.View>
       {/* Exercise Picker Dialog */}
       <Modal
         isVisible={exercisePickerVisible}
@@ -216,6 +227,11 @@ const useStyles = makeStyles(() => {
       alignItems: "center",
       justifyContent: "flex-start",
       width: "100%",
+    },
+    setGroupList: {
+      flex: 1,
+      width: "100%",
+      height: "100%",
     },
   };
 });

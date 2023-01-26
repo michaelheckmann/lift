@@ -12,7 +12,7 @@ import { Text, TouchableOpacity, Vibration, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
 import QuickMenuModal from "src/component/Shared/QuickMenuModal";
-import { useLiftStore, useTempStore } from "src/store";
+import { useTempStore } from "src/store";
 import { formatCountdown } from "src/utils/functions/formatCountdown";
 import useCountdown from "src/utils/hooks/useCountdown";
 
@@ -51,8 +51,6 @@ export default function WorkoutHeader({
     countStart,
     intervalMs: intervalValue,
   });
-
-  const { global } = useLiftStore().operations;
 
   useEffect(() => {
     if (count === 0) {

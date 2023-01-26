@@ -51,6 +51,7 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
   const margin = useSharedValue(0);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [moveStarted, setMoveStarted] = useState(false);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -110,6 +111,12 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
         context.startTop + event.translationY,
         WINDOW_HEIGHT - HEIGHT_COLLAPSED
       );
+
+      // This is necessary, else this would get triggered
+      // on scroll
+      if (Math.abs(event.translationY) > 10 && !moveStarted) {
+        runOnJS(setMoveStarted)(true);
+      }
     },
     onEnd() {
       // (WINDOW_HEIGHT - top.value) is the distance from the bottom
@@ -131,6 +138,7 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
           top.value = WINDOW_HEIGHT - HEIGHT_EXPANDED;
         }
       }
+      runOnJS(setMoveStarted)(false);
     },
   });
 
@@ -166,6 +174,7 @@ export default function WorkoutSheet({ isOpen, onClose, workoutData }) {
               workoutData={workoutData}
               isCollapsed={isCollapsed}
               setExpanded={setExpanded}
+              moveStarted={moveStarted}
             />
           </Animated.View>
         </PanGestureHandler>
