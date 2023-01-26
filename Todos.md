@@ -14,7 +14,7 @@
 [X] => Fix network
 [X] => Delete exercise
 [X] => Haptics
-[ ] => Timer
+[ ] => Timer animation
 [ ] => Previous exercise
 [ ] => Rework login
 [ ] => Replace exercise
@@ -22,9 +22,9 @@
 [ ] => Custom keyboard overlay
 
 [ ] => Nice success transition
+[ ] => Nice delete transition
 [ ] => Create new exercise screen polish
 [ ] => Delete set polish
-[ ] => Custom Modal component
 [ ] => Past workout overview
 [ ] => Browse past workouts in exercise picker
 [ ] =>

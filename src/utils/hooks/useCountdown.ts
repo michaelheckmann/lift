@@ -97,7 +97,9 @@ function useCountdown(
 
   // Custom addition
   const decrementCountdown = (interval: number) => {
-    if (count - interval < countStop) return resetCountdown();
+    // Leave two seconds on the clock to make the
+    // transition to the next round smoother
+    if (count - interval < countStop) return setCount(2);
     if (!isCountdownRunning) startCountdown();
     setCount((count) => count - interval);
   };

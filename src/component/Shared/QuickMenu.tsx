@@ -67,11 +67,11 @@ export default function QuickMenu({
     if (showMenu) {
       width.value = withTiming(theme.spacing["56"], config);
       height.value = withTiming(containerHeight, config);
-      opacity.value = withTiming(1, { duration: 150 });
+      opacity.value = 1;
     } else {
       width.value = withTiming(0, config);
       height.value = withTiming(0, config);
-      opacity.value = withTiming(0, { duration: 150 });
+      opacity.value = 0;
     }
   }, [showMenu]);
 
@@ -82,7 +82,13 @@ export default function QuickMenu({
       right: right.value,
       width: width.value,
       height: height.value,
-      opacity: opacity.value,
+      opacity: withTiming(opacity.value, { duration: 100 }),
+    };
+  });
+
+  const animatedContentStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(opacity.value, { duration: 80 }),
     };
   });
 
@@ -90,7 +96,7 @@ export default function QuickMenu({
     <Animated.View style={[styles.container, animatedStyles]}>
       <View style={styles.overflowContainer}>
         {options.map((option, index) => (
-          <View key={option.label}>
+          <Animated.View key={option.label} style={animatedContentStyle}>
             <TouchableOpacity
               onPress={option.onPress}
               style={styles.optionContainer}
@@ -103,7 +109,7 @@ export default function QuickMenu({
               <Text style={styles.optionText}>{option.label}</Text>
             </TouchableOpacity>
             {index !== options.length - 1 && <View style={styles.separator} />}
-          </View>
+          </Animated.View>
         ))}
       </View>
     </Animated.View>

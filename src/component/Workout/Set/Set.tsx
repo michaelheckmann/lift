@@ -8,6 +8,7 @@ import { useSharedValue } from "react-native-reanimated";
 import { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
 import QuickMenuModal from "src/component/Shared/QuickMenuModal";
 import { updateSet } from "src/store/actions/setActions";
+import { setLastFinishedSet } from "src/store/actions/tempActions";
 import { debounce } from "src/utils/functions/debounce";
 import { getSetSpacing } from "src/utils/functions/getSetSpacing";
 import { getThemeConfig } from "src/utils/functions/getThemeConfig";
@@ -97,6 +98,16 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
     },
   ];
 
+  const handleDoneToggle = (
+    id: string,
+    value: boolean,
+    onChange: (any) => void
+  ) => {
+    console.log("HANDLE DONE TOGGLE");
+    !value && setLastFinishedSet(id);
+    onChange(!value);
+  };
+
   return (
     <View key={set.id} style={styles.container}>
       {/* Set Number */}
@@ -172,7 +183,7 @@ export default function Set({ set, setIndex, setGroupIndex, methods }: Props) {
         render={({ field: { onChange, onBlur, value } }) => (
           <TouchableOpacity
             onBlur={onBlur}
-            onPress={() => onChange(!value)}
+            onPress={() => handleDoneToggle(set.id, value, onChange)}
             style={[
               styles.containerItem,
               styles.lastContainerItem,

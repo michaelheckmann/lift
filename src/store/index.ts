@@ -12,6 +12,7 @@ import { OperationSlice, operationsState } from "./slices/operationsSlice";
 import { setGroupsState } from "./slices/setgroupsSlice";
 import { setsState } from "./slices/setsSlice";
 import { settingsState } from "./slices/settingsSlice";
+import { TempSlice, tempState } from "./slices/tempSlice";
 import { workoutsState } from "./slices/workoutsSlice";
 
 export interface StoreType {
@@ -45,6 +46,11 @@ export const useLiftStore = create<StoreType>()(
     )
   )
 );
+
+// This store is used for temporary data that is not persisted
+export const useTempStore = create<TempSlice>()(() => {
+  return tempState;
+});
 
 /**
  * It resets the state of the lift store to the default state

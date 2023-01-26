@@ -8,13 +8,16 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, Vibration, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import { QuickMenuOptionType } from "src/component/Shared/QuickMenu";
 import QuickMenuModal from "src/component/Shared/QuickMenuModal";
+import { useLiftStore, useTempStore } from "src/store";
 import { formatCountdown } from "src/utils/functions/formatCountdown";
 import useCountdown from "src/utils/hooks/useCountdown";
 import { FinishedSet } from "./Workout";
+
+const DEFAULT_COUNTDOWN = 90; // seconds
 
 type Props = {
   isCollapsed: boolean;
@@ -42,36 +45,37 @@ export default function WorkoutHeader({
 
   const [timerMenuVisible, setTimerMenuVisible] = useState(false);
   const [workoutMenuVisible, setWorkoutMenuVisible] = useState(false);
+  const { lastFinishedSet } = useTempStore();
 
   const [intervalValue, setIntervalValue] = useState(1000);
-  const [countStart, setCountStart] = useState(5);
+  const [countStart, setCountStart] = useState(DEFAULT_COUNTDOWN);
   const [
     count,
-    {
-      startCountdown,
-      resetCountdown,
-      incrementCountdown,
-      decrementCountdown,
-    },
+    { startCountdown, resetCountdown, incrementCountdown, decrementCountdown },
   ] = useCountdown({
     countStart,
     intervalMs: intervalValue,
   });
 
+  const { global } = useLiftStore().operations;
+  const showConfig = () => {
+    console.log(global);
+  };
+
   useEffect(() => {
     if (count === 0) {
-      console.log("Countdown finished");
+      Vibration.vibrate(200);
       resetCountdown();
     }
   }, [count]);
 
   useEffect(() => {
-    if (countdownTrigger) {
+    console.log("lastFinishedSet", lastFinishedSet);
+    if (lastFinishedSet) {
       resetCountdown();
       startCountdown();
-      setCountdownTrigger(null);
     }
-  }, [countdownTrigger]);
+  }, [lastFinishedSet]);
 
   const openTimerMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -112,6 +116,14 @@ export default function WorkoutHeader({
       icon: "add-circle-outline",
       onPress: () => {
         incrementCountdown(30);
+        closeTimerMenu();
+      },
+    },
+    {
+      label: "Stop timer",
+      icon: "stop-circle-outline",
+      onPress: () => {
+        resetCountdown();
         closeTimerMenu();
       },
     },
@@ -159,6 +171,7 @@ export default function WorkoutHeader({
             style={styles.iconContainer}
             onPress={openTimerMenu}
             ref={timerButtonRef}
+            disabled={isCollapsed}
           >
             <Icon
               name="timer-outline"
@@ -170,7 +183,9 @@ export default function WorkoutHeader({
           {/* Countdown */}
           <TouchableOpacity
             style={styles.timeContainer}
-            onPress={startCountdown}
+            // onPress={startCountdown}
+            onPress={showConfig}
+            disabled={isCollapsed}
           >
             <Text style={styles.time}>{formatCountdown(count)}</Text>
           </TouchableOpacity>
@@ -179,6 +194,7 @@ export default function WorkoutHeader({
           <TouchableOpacity
             style={styles.iconContainer}
             onPress={openWorkoutMenu}
+            disabled={isCollapsed}
             ref={workoutButtonRef}
           >
             <Icon

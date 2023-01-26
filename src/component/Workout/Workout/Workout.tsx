@@ -72,6 +72,8 @@ export default function Workout({
     keyName: "fieldId",
   });
   const { fields, append } = fieldArrayOps;
+
+  // This is used to trigger the countdown
   const setGroups = useWatch({
     control,
     name: "setGroups",
@@ -82,6 +84,10 @@ export default function Workout({
   );
 
   useEffect(() => {
+    // This code checks if a set has been marked as completed
+    // and adds it to the finished set if it hasn't been added yet.
+    // If a set has been marked as incomplete and was already added
+    // to the finished set, it is removed from the finished set.
     let newFinishedSet: FinishedSet | null = null;
     let removedSet: FinishedSet | null = null;
     if (setGroups && setGroups.length > 0) {
@@ -103,7 +109,6 @@ export default function Workout({
         }
       });
     }
-    console.log("newFinishedSet", newFinishedSet?.id, finishedSets.length);
     if (newFinishedSet) {
       setFinishedSets([...finishedSets, newFinishedSet]);
       setCountdownTrigger(newFinishedSet);
