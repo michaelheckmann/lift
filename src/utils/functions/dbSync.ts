@@ -33,7 +33,8 @@ export async function updateRemoteState<T>(
   console.log(endpoint, method, body);
 
   const token = await user.getIdToken();
-  // console.log("🚀 ~ file: dbSync.ts ~ line 22 ~ token", token);
+  // Console log this value to populate the process.env.CUSTOM_ID_TOKEN variable
+  // console.log("userIdToken", token);
 
   const options: RequestInit = {
     method,

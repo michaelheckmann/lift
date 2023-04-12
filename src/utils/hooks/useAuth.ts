@@ -15,7 +15,7 @@ export function useAuth(): UseAuthReturnType {
   const [user, setUser] = useState<User>();
 
   useEffect(() => {
-    const unsubscribeFromAuthStatuChanged = onAuthStateChanged(
+    const unsubFromAuthStatusChanged = onAuthStateChanged(
       auth,
       async (user) => {
         if (user) {
@@ -30,7 +30,7 @@ export function useAuth(): UseAuthReturnType {
         }
       }
     );
-    return unsubscribeFromAuthStatuChanged;
+    return unsubFromAuthStatusChanged;
   }, []);
 
   return {
