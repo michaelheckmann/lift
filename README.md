@@ -61,3 +61,4 @@ If you get this error when running `yarn start`, try logging out of expo `expo l
 - [ ] Include Realm
 - [ ] Include Tamagui
 - [ ] Upgrade Expo & Reanimated
+- [ ] [Include react-native-typography](https://github.com/hectahertz/react-native-typography)
