@@ -55,3 +55,9 @@ yarn start
 ### ApiV2Error: Entity Not Authorized.
 
 If you get this error when running `yarn start`, try logging out of expo `expo logout` and logging back in `npx expo login`.
+  
+## Todos
+
+- [ ] Include Realm
+- [ ] Include Tamagui
+- [ ] Upgrade Expo & Reanimated
